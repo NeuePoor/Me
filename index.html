@@ -5,14 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <!-- 
   项目名称: Folio Design System
-  版本: v2.8 (Restore Info & Dynamic ID)
+  版本: v2.9 (Sync Assets & Fallback)
   
   核心变更:
-  - 恢复 v2.5 的 Info 详细内容。
-  - 项目卡片文字改为显示 JSON 中的 id。
-  - 保持数据驱动逻辑。
+  - 同步更新 fallbackProjects 中的图片链接。
+  - 保持 v2.8 的 Info 详细内容与动态 ID 逻辑。
 -->
-<title>Folio | v2.8</title>
+<title>Folio | v2.9</title>
 <link id="favicon" rel="icon" type="image/webp" href="https://folio.neuepoor.com/Favicon.webp">
 
 <style>
@@ -187,14 +186,18 @@
         { name: '(Play)', link: 'https://play.neuepoor.com' },
         { name: 'Me', link: 'https://me.neuepoor.com' }
       ],
-      // 恢复 v2.5 的详细 info 内容
       infoSections: [
         { title: "Works", content: "Branding<br>Vision identity<br>Look Book<br>Interface<br>Packaging<br>Editorial<br>Apparel", columnSpan: "grid-column: span 6" },
         { title: "Service", content: "Creative Direction<br>Art Direction<br>Graphic<br>Illustration<br>Motion<br>Typeface", columnSpan: "grid-column: span 4" },
         { title: "Contacts", content: "Email<br>Instagram<br>Github<br>小红书<br>Wechat", columnSpan: "grid-column: span 2" }
       ],
       fallbackProjects: [
-        { id: "02001", tag: ["Branding"], img: "https://neuepoor.com" }
+        { 
+          id: "02001", 
+          tag: ["Branding"], 
+          // 同步更新默认回退图片的链接
+          img: "https://folio.neuepoor.com/Me/3.png" 
+        }
       ]
     };
 
@@ -247,7 +250,6 @@
         const galleryHTML = projects.map((item, index) => `
           <div class="fl-item-wrapper span-${index + 1} fl-reveal">
             <div class="type-item-container">
-              <!-- 这里修改为显示 item.id -->
               <span class="type-item">${item.id || 'Project'}</span>
             </div>
             <a href="/${item.id}/index.html" class="fl-item" style="background-image:url('${item.img}');"></a>
