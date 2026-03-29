@@ -23,7 +23,7 @@
     --fl-reveal-dur: 1.2s;  
     --fl-font-fallback: "Arial", "Helvetica", sans-serif;
     
-    /* Skeleton Overlays | 骨架屏遮罩 (不再使用纯色块，改为半透明层) */
+    /* Skeleton Overlays | 骨架屏遮罩 */
     --fl-skeleton-op: rgba(0,0,0,0.03);
   }
 
@@ -86,7 +86,9 @@
   .fl-logo__gif-wrap {
     position: fixed; top: 0; left: 4px; height: var(--fl-nav-h);
     display: flex; align-items: center; z-index: 1001; 
+    /* Optimization: Limit transitions to transform and opacity | 优化：限制过渡属性 */
     transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
+    will-change: transform, opacity;
   }
   
   .fl-logo__gif { 
@@ -104,12 +106,18 @@
     padding: 0 4px; height: var(--fl-nav-h); top: 0;
     mix-blend-mode: difference; 
     transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
+    will-change: transform, opacity;
   }
 
   .fl-logo-text {
     text-decoration: none; color: #fff;
     font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
     transition: opacity 0.3s var(--fl-ease);
+    /* Boundary protection for mobile | 移动端边界保护 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
   }
   .fl-logo-text:hover { opacity: 0.7; }
 
@@ -140,6 +148,7 @@
       .fl-header { background: rgba(20, 20, 20, 0.75); border: 0.5px solid rgba(255,255,255,0.05); }
     }
     .fl-nav__link, .fl-logo-text { font-size: var(--header-fs-m); color: var(--fl-text); } 
+    .fl-logo-text { max-width: 120px; }
   }
 
   /* ==========================================================================
@@ -150,29 +159,24 @@
     display: flex; align-items: center; justify-content: center;
     transform: translateZ(0); min-height: 200px;
     user-select: none; -webkit-user-drag: none;
-    background-color: var(--fl-bg); /* 改为背景色，让模糊内容更自然 */
+    background-color: var(--fl-bg); 
   }
   
-  /* Blur-up Animation | 模糊占位逻辑 */
   .fl-cdn-media { 
     width: 100%; height: auto; display: block; 
-    opacity: 0.1; /* 初始显示非常淡，配合模糊形成占位 */
-    filter: blur(40px) scale(1.05); /* 初始大模糊，scale 消除边缘白边 */
-    transition: 
-      opacity 1.2s var(--fl-ease), 
-      filter 1.2s var(--fl-ease);
+    opacity: 0.05; 
+    filter: blur(40px) scale(1.05); 
+    transition: opacity 1.2s var(--fl-ease), filter 1.2s var(--fl-ease);
     object-fit: cover; 
     z-index: 2;
     will-change: filter, opacity;
   }
   
-  /* Loaded State | 加载完成后的状态切换 */
   .is-loaded .fl-cdn-media { 
     opacity: 1; 
     filter: blur(0) scale(1);
   }
 
-  /* Subtle Skeleton Overlay | 微弱的扫光层 */
   .fl-cdn-container::after { 
     content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
     background: linear-gradient(90deg, transparent, var(--fl-skeleton-op), transparent); 
@@ -187,6 +191,11 @@
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     z-index: 10; background: transparent;
     cursor: default; pointer-events: auto;
+  }
+  
+  /* Optimization: Shield behavior on mobile | 优化：移动端遮断层行为 */
+  @media (max-width: 768px) {
+    .fl-cdn-shield { pointer-events: none; }
   }
 
   .fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--info-color); opacity: 0.8; }
@@ -252,22 +261,19 @@
      */
     const CONFIG = {
       version: "4.6.4",
-      // SEO & Head Settings [LOCKED]
       seo: { 
         _lock: true,
         title: "Foo", 
-        description: "Portfolio of Foo - I'm a multi-disciplinary designer with focus on Graphic&Illustration, Creative Direction, Branding, Visual Identities, Packaging, Website, and Print& Editorial Design. My work experience in various industries has enriched my design methods.",
+        description: "Portfolio of Foo - Designer with focus on Visual Identities and Digital Experiences.",
         canonical: "http://fo.neuepoor.com",
         favicon: "https://folio.neuepoor.com/favicon.webp" 
       },
-      // Typography Tokens [LOCKED]
       typography: {
         _lock: true,
         header: { font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "21px", color: "#ffffff" },
         info: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" },
         gallery: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" }
       },
-      // Header & Navigation [LOCKED]
       header: {
         _lock: true,
         logo: { 
@@ -283,7 +289,6 @@
           { name: 'Me', link: 'https://fo.neuepoor.com/me' }
         ]
       },
-      // Info Section [LOCKED]
       info: {
         _lock: true,
         data: [
@@ -298,7 +303,6 @@
           `, span: 2 }
         ]
       },
-      // Gallery Section [EDITABLE]
       gallery: {
         _editable: true,
         items: [
@@ -309,11 +313,7 @@
           { id: "02005", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-7.png" }
         ]
       },
-      // Archive Section [EDITABLE]
-      archive: {
-        _editable: true,
-        items: [] 
-      }
+      archive: { _editable: true, items: [] }
     };
 
     /**
@@ -323,56 +323,79 @@
       initSEO() {
         const s = CONFIG.seo;
         document.title = s.title;
-        let metaDesc = document.querySelector('meta[name="description"]') || document.createElement('meta');
-        metaDesc.name = 'description'; metaDesc.content = s.description;
-        document.head.appendChild(metaDesc);
-        let linkCan = document.querySelector('link[rel="canonical"]') || document.createElement('link');
-        linkCan.rel = 'canonical'; linkCan.href = s.canonical;
-        document.head.appendChild(linkCan);
         const fav = document.getElementById('favicon');
         if (fav) fav.href = s.favicon;
       },
 
-      // Blur-up Enabled Rendering Engine | 启用模糊占位的渲染引擎
       renderMedia(src) {
         if (!src) return '';
         const ext = src.split('.').pop().toLowerCase();
         const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
         const isAudio = ['mp3', 'wav', 'ogg'].includes(ext);
-        
         const commonAttrs = `class="fl-cdn-media" draggable="false" oncontextmenu="return false;"`;
         
-        let mediaTag = '';
         if (isVideo) {
-          mediaTag = `<video ${commonAttrs} muted loop playsinline autoplay preload="metadata"><source src="${src}" type="video/${ext === 'mov' ? 'quicktime' : ext}"></video>`;
+          return `
+            <div class="fl-cdn-container">
+              <div class="fl-cdn-shield" oncontextmenu="event.preventDefault();"></div>
+              <video ${commonAttrs} muted loop playsinline webkit-playsinline autoplay preload="auto"
+                x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait">
+                <source src="${src}" type="video/${ext === 'mov' ? 'quicktime' : ext}">
+              </video>
+            </div>`;
         } else if (isAudio) {
-          mediaTag = `<audio ${commonAttrs} controls preload="metadata"><source src="${src}" type="audio/mpeg"></audio>`;
+          return `<div class="fl-cdn-container"><audio ${commonAttrs} controls preload="metadata"><source src="${src}" type="audio/mpeg"></audio></div>`;
         } else {
-          mediaTag = `<img ${commonAttrs} src="${src}" loading="lazy" decoding="async" alt="Foo Portfolio Material">`;
+          return `<div class="fl-cdn-container"><div class="fl-cdn-shield"></div><img ${commonAttrs} src="${src}" loading="lazy" decoding="async"></div>`;
         }
-
-        return `
-          <div class="fl-cdn-container">
-            <div class="fl-cdn-shield" oncontextmenu="event.preventDefault();"></div>
-            ${mediaTag}
-          </div>
-        `;
       },
 
+      // Optimization: rAF Scroll Interaction | 优化：rAF 滚动交互
       initScrollInteraction() {
         const header = document.getElementById('ui-header');
         const logoWrap = document.getElementById('ui-logo-gif-wrap');
-        let isScrolling;
-        const handleScroll = () => {
-          if (window.innerWidth <= 768) {
-            header.classList.add('is-nav-hidden'); logoWrap.classList.add('is-nav-hidden');
-            window.clearTimeout(isScrolling);
-            isScrolling = setTimeout(() => {
-              header.classList.remove('is-nav-hidden'); logoWrap.classList.remove('is-nav-hidden');
-            }, 250);
+        let isScrolling = false;
+        let ticking = false;
+
+        const updateHeader = () => {
+          if (isScrolling) {
+            header.classList.add('is-nav-hidden');
+            logoWrap.classList.add('is-nav-hidden');
+          } else {
+            header.classList.remove('is-nav-hidden');
+            logoWrap.classList.remove('is-nav-hidden');
           }
+          ticking = false;
         };
-        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        let scrollTimer = null;
+        window.addEventListener('scroll', () => {
+          if (window.innerWidth > 768) return;
+          isScrolling = true;
+          if (!ticking) {
+            requestAnimationFrame(updateHeader);
+            ticking = true;
+          }
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(() => {
+            isScrolling = false;
+            requestAnimationFrame(updateHeader);
+          }, 250);
+        }, { passive: true });
+      },
+
+      // WeChat AutoPlay Singleton | 微信自动播放单例
+      initWeChatPlay() {
+        const triggerPlay = () => {
+          document.querySelectorAll('.fl-cdn-media').forEach(media => {
+            if (media.tagName === 'VIDEO') media.play().catch(() => {});
+          });
+        };
+        if (typeof WeixinJSBridge !== "undefined") {
+          WeixinJSBridge.invoke('getNetworkType', {}, triggerPlay);
+        } else {
+          document.addEventListener("WeixinJSBridgeReady", triggerPlay, { once: true });
+        }
       },
 
       applyTypography() {
@@ -418,22 +441,24 @@
 
         grid.innerHTML = infoHTML + galleryHTML;
         
+        // State Machine Optimization | 加载状态机优化
         document.querySelectorAll('.fl-cdn-media').forEach(media => {
           const container = media.closest('.fl-cdn-container');
           const markLoaded = () => {
-            // 延迟一点点确保过渡平滑
-            setTimeout(() => container.classList.add('is-loaded'), 50);
+            // Use requestAnimationFrame for smoother UI transition | 使用 rAF 确保过渡平滑
+            requestAnimationFrame(() => container.classList.add('is-loaded'));
           };
-          if (media.tagName === 'VIDEO' || media.tagName === 'AUDIO') {
-            media.addEventListener('loadeddata', markLoaded);
-          } else {
+
+          if (media.tagName === 'VIDEO') {
+            // Sync check: readyState 3 (HAVE_FUTURE_DATA) or higher | 同步检查：就绪状态是否已达标
+            if (media.readyState >= 3) markLoaded();
+            else media.addEventListener('loadeddata', markLoaded, { once: true });
+          } else if (media.tagName === 'IMG') {
+            // Sync check: complete status | 同步检查：图片是否已加载完成
             if (media.complete) markLoaded();
-            else media.addEventListener('load', markLoaded);
+            else media.addEventListener('load', markLoaded, { once: true });
           }
-          media.addEventListener('error', () => {
-            container.classList.add('is-loaded');
-            media.style.display = 'none';
-          });
+          media.addEventListener('error', markLoaded, { once: true });
         });
 
         this.initReveal();
@@ -462,6 +487,7 @@
 
       start() {
         this.initSEO();
+        this.initWeChatPlay(); // Higher priority for WeChat | 优先初始化微信策略
         this.applyTypography();
         this.renderHeader();
         this.buildContent();
