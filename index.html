@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <title>Folio | Optimized</title>
-<link id="favicon" rel="icon" type="image/webp" href="">
+<!-- SEO Elements will be injected by ENGINE | SEO 元素将由引擎注入 -->
+<link id="favicon" rel="icon" type="image/webp" href="https://folio.neuepoor.com/favicon.webp">
 
 <style>
   /* ==========================================================================
-     BASE CSS & DYNAMIC TOKENS
+     BASE CSS & DYNAMIC TOKENS | 基础样式与动态令牌 [LOCKED]
      ========================================================================== */
   :root {
     --fl-bg: #ffffff;
@@ -22,7 +23,7 @@
     --fl-reveal-dur: 1.2s;  
     --fl-font-fallback: "Arial", "Helvetica", sans-serif;
     
-    /* Skeleton Colors */
+    /* Skeleton Colors | 骨架屏颜色 */
     --fl-skeleton-bg: #f2f2f2;
     --fl-skeleton-highlight: #e6e6e6;
   }
@@ -60,6 +61,7 @@
     line-height: 1.4;
   }
 
+  /* Grid Layout | 网格布局 [LOCKED] */
   .fl-grid {
     display: grid; 
     grid-template-columns: repeat(12, 1fr);
@@ -69,9 +71,7 @@
     transform: translateZ(0);
   }
 
-  /* ==========================================================================
-     COMPONENT: REVEAL
-     ========================================================================== */
+  /* Reveal Animation | 显现动画 [LOCKED] */
   .fl-reveal {
     opacity: 0;
     transform: translateY(var(--fl-reveal-dist));
@@ -79,21 +79,26 @@
       opacity var(--fl-reveal-dur) var(--fl-ease), 
       transform var(--fl-reveal-dur) var(--fl-ease);
     will-change: transform, opacity;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    perspective: 1000px;
   }
   .fl-reveal.is-visible { opacity: 1; transform: translateY(0); }
 
   /* ==========================================================================
-     COMPONENT: LOGO & HEADER
+     COMPONENT: HEADER & LOGO | 组件：页头与标识 [LOCKED]
      ========================================================================== */
   .fl-logo__gif-wrap {
     position: fixed; top: 0; left: 4px; height: var(--fl-nav-h);
     display: flex; align-items: center; z-index: 1001; 
     transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
   }
-  .fl-logo__gif { height: var(--logo-size-pc); width: auto; cursor: pointer; transition: opacity 0.3s; }
+  
+  .fl-logo__gif { 
+    height: var(--logo-size-pc); 
+    width: auto; cursor: pointer; opacity: 0; 
+    mix-blend-mode: normal; 
+    transition: opacity 0.3s var(--fl-ease); 
+  }
+  
+  .fl-logo__gif:hover { opacity: 0.7 !important; }
 
   .fl-header {
     position: fixed; width: 100%; z-index: 999;
@@ -103,22 +108,23 @@
     transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
   }
 
+  .fl-logo-text {
+    text-decoration: none; color: #fff;
+    font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
+    transition: opacity 0.3s var(--fl-ease);
+  }
+  .fl-logo-text:hover { opacity: 0.7; }
+
   .fl-nav { display: flex; gap: 40px; }
   .fl-nav__link {
     font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
-    color: #fff; text-decoration: none; transition: opacity 0.3s;
+    color: #fff; text-decoration: none; transition: opacity 0.3s var(--fl-ease);
   }
+  .fl-nav__link:hover { opacity: 0.7; }
 
-  /* ==========================================================================
-     MOBILE ONLY INTERACTION
-     ========================================================================== */
+  /* Mobile Logic | 移动端交互逻辑 [LOCKED] */
   @media (max-width: 768px) {
-    .is-nav-hidden { 
-      transform: translateY(80px); 
-      opacity: 0; 
-      pointer-events: none; 
-    }
-    
+    .is-nav-hidden { transform: translateY(80px); opacity: 0; pointer-events: none; }
     .fl-grid { padding: 4px 0 120px; }
     .fl-logo__gif-wrap { top: auto; bottom: 12px; left: 28px; height: var(--fl-nav-h-m); }
     .fl-logo__gif { height: var(--logo-size-m); }
@@ -135,29 +141,18 @@
     @media (prefers-color-scheme: dark) {
       .fl-header { background: rgba(20, 20, 20, 0.75); border: 0.5px solid rgba(255,255,255,0.05); }
     }
-    .fl-nav__link { font-size: var(--header-fs-m); color: var(--fl-text); } 
+    .fl-nav__link, .fl-logo-text { font-size: var(--header-fs-m); color: var(--fl-text); } 
   }
 
   /* ==========================================================================
-     MEDIA & INFO
+     CDN & INFO | 媒体与信息栏 [LOCKED]
      ========================================================================== */
   .fl-cdn-container { 
-    position: relative; 
-    width: 100%; 
-    overflow: hidden; 
-    background-color: transparent; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    transform: translateZ(0);
-    /* 移除固定比例，允许高度自适应 */
-    min-height: 100px; 
+    position: relative; width: 100%; overflow: hidden; 
+    background-color: transparent; display: flex; align-items: center; justify-content: center;
+    transform: translateZ(0); min-height: 100px; 
   }
-  
-  .fl-cdn-container:not(.is-loaded) {
-    background-color: var(--fl-skeleton-bg);
-  }
-
+  .fl-cdn-container:not(.is-loaded) { background-color: var(--fl-skeleton-bg); }
   .fl-cdn-container::after { 
     content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
     background: linear-gradient(90deg, transparent, var(--fl-skeleton-highlight), transparent); 
@@ -166,79 +161,121 @@
   .is-loaded.fl-cdn-container::after { display: none; }
   @keyframes skeleton-wave { 100% { transform: translateX(100%); } }
 
-  .fl-cdn-media { 
-    width: 100%; 
-    height: auto; /* 关键：高度根据宽度缩放自适应 */
-    display: block; 
-    opacity: 0; 
-    transition: opacity 0.5s var(--fl-ease); 
-  }
+  .fl-cdn-media { width: 100%; height: auto; display: block; opacity: 0; transition: opacity 0.5s var(--fl-ease); }
   .is-loaded .fl-cdn-media { opacity: 1; }
 
   .fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--info-color); opacity: 0.8; }
   .fl-info__title { display: block; margin-bottom: 4.2em; font-weight: normal; }
+  
+  /* Link Styling in Info Section | 信息栏内的链接样式 */
+  .fl-info a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: opacity 0.3s var(--fl-ease); }
+  .fl-info a:hover { opacity: 0.6; }
+  .fl-info .trigger-wechat { cursor: pointer; }
 
+  /* ==========================================================================
+     GALLERY & ARCHIVE | 展示与归档 [EDITABLE]
+     ========================================================================== */
   .fl-item-wrapper { position: relative; display: flex; flex-direction: column; }
   .type-item { font-family: var(--gallery-font); font-size: var(--gallery-fs); font-weight: var(--gallery-fw); color: var(--gallery-color); }
 
   @media (min-width: 769px) {
-    /* 如果高度自适应，标签位置需要保持在容器中心或根据需要调整 */
     .type-item-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; mix-blend-mode: difference; z-index: 20; pointer-events: none; }
     .type-item { color: #fff; opacity: 0; transform: translateY(5px); transition: all 0.4s var(--fl-ease); }
     .fl-item-wrapper:hover .type-item { opacity: 1; transform: translateY(0); }
   }
+
+  /* ==========================================================================
+     OVERLAY: WECHAT | 叠加层：微信 [LOCKED]
+     ========================================================================== */
+  .fl-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2000; opacity: 0; pointer-events: none;
+    transition: opacity 0.4s var(--fl-ease);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .fl-overlay.is-active { opacity: 1; pointer-events: auto; }
+  .fl-overlay img { max-width: 300px; width: 80%; height: auto; transform: scale(0.9); transition: transform 0.5s var(--fl-ease); }
+  .fl-overlay.is-active img { transform: scale(1); }
 </style>
 </head>
 <body>
 
-  <div class="fl-logo__gif-wrap" id="mobile-logo-wrap">
-    <img class="fl-logo__gif" id="ui-gif" alt="Logo" draggable="false">
+  <!-- Logo GIF Layer | Logo GIF 独立层级 [LOCKED] -->
+  <div class="fl-logo__gif-wrap" id="ui-logo-gif-wrap">
+    <img class="fl-logo__gif" id="ui-logo-gif" alt="Logo" draggable="false">
   </div>
 
+  <!-- Main Header | 主导航栏 [LOCKED] -->
   <header class="fl-header" id="ui-header">
-    <a href="https://fo.neuepoor.com" class="fl-logo">
-      <span style="display:none">Foo</span>
-    </a>
+    <a href="https://neuepoor.com" class="fl-logo-text" id="ui-logo-text">Foo</a>
     <nav class="fl-nav" id="ui-nav"></nav>
   </header>
 
+  <!-- Content Grid | 内容网格 -->
   <main class="fl-grid" id="ui-main-grid"></main>
+
+  <!-- WeChat Overlay | 微信全屏遮罩 [LOCKED] -->
+  <div class="fl-overlay" id="ui-wechat-overlay">
+    <img src="https://folio.neuepoor.com/wechatsuckboyz.svg" alt="WeChat QR Code" draggable="false">
+  </div>
 
   <script>
     /**
-     * CONFIG v4.5.8
-     * 第一性原则：除标注为 _editable: true 的区域外，
-     * 未经用户显式指令，禁止 AI 修改任何标记为 _lock: true 的配置项。
+     * CONFIG v4.6.4
+     * Dual-Language Rules & State Locking
+     * 双语规则与状态锁定说明
      */
     const CONFIG = {
-      version: "4.5.8",
+      version: "4.6.4",
+      // SEO & Head Settings [LOCKED] | SEO 与头部设置 [锁定]
       seo: { 
         _lock: true,
-        title: "Folio | Optimized System", 
-        favicon: "https://folio.neuepoor.com/Favicon.webp" 
+        title: "Foo", 
+        description: "Portfolio of Foo - I'm a multi-disciplinary designer with focus on Graphic&Illustration, Creative Direction, Branding, Visual Identities, Packaging, Website, and Print& Editorial Design. My work experience in various industries has enriched my design methods.", // 网页描述
+        canonical: "http://fo.neuepoor.com", // 规范链接
+        favicon: "https://folio.neuepoor.com/favicon.webp" 
       },
+      // Typography Tokens [LOCKED] | 字体令牌 [锁定]
       typography: {
         _lock: true,
         header: { font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "21px", color: "#ffffff" },
         info: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" },
         gallery: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" }
       },
+      // Header & Navigation [LOCKED] | 导航与标识 [锁定]
       header: {
         _lock: true,
-        logo: { gif: "https://folio.neuepoor.com/logo.gif", link: "https://fo.neuepoor.com", sizePC: "32px", sizeMobile: "18px" },
-        nav: [{ name: 'Works', link: '#' }, { name: '(Play)', link: '#' }, { name: 'Me', link: '#' }]
+        logo: { 
+          gif: "https://folio.neuepoor.com/logo.gif", 
+          link: "https://neuepoor.com", 
+          text: "Foo",
+          sizePC: "32px", 
+          sizeMobile: "18px" 
+        },
+        nav: [
+          { name: 'Works', link: 'https://fo.neuepoor.com/works' }, 
+          { name: '(Play)', link: 'https://fo.neuepoor.com/play' }, 
+          { name: 'Me', link: 'https://fo.neuepoor.com/me' }
+        ]
       },
-      // [LOCK] Info Section - 禁止修改
+      // Info Section [LOCKED] | 简介区域 [锁定]
       info: {
         _lock: true,
         data: [
           { title: "Works", content: "Branding<br>Vision identity<br>Look Book<br>Interface<br>Packaging<br>Editorial<br>Apparel", span: 6 },
           { title: "Service", content: "Creative Direction<br>Art Direction<br>Graphic<br>Illustration<br>Motion<br>Typeface", span: 4 },
-          { title: "Contacts", content: "Email<br>Instagram<br>Github<br>小红书<br>Wechat", span: 2 }
+          { title: "Contacts", content: `
+            <a href="mailto:poorleaglguy@qq.com">Email</a><br>
+            <a href="https://www.instagram.com/neuepoor" target="_blank">Instagram</a><br>
+            <a href="https://github.com/NeuePoor" target="_blank">Github</a><br>
+            <a href="https://xhslink.com/m/9qPnrun1Dh9" target="_blank">小红书</a><br>
+            <span class="trigger-wechat" id="trigger-wechat">Wechat</span>
+          `, span: 2 }
         ]
       },
-      // [EDITABLE] Gallery Section - 可调区域
-      // 更新：移除了 ratio，由图片内容自然撑开高度
+      // Gallery Section [EDITABLE] | 作品展厅 [可编辑]
       gallery: {
         _editable: true,
         items: [
@@ -248,47 +285,69 @@
           { id: "02004", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-6.png" },
           { id: "02005", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-7.png" }
         ]
+      },
+      // Archive Section [EDITABLE] | 归档区域 [可编辑]
+      archive: {
+        _editable: true,
+        items: [] 
       }
     };
 
+    /**
+     * ENGINE [LOCKED] | 核心引擎 [锁定]
+     * Internal logic and dynamic interactions.
+     * 内部逻辑与动态交互。
+     */
     const ENGINE = {
+      // Injects SEO meta tags into head | 向头部注入 SEO 元数据
+      initSEO() {
+        const s = CONFIG.seo;
+        document.title = s.title;
+
+        // Meta Description | 注入描述
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (!metaDesc) {
+          metaDesc = document.createElement('meta');
+          metaDesc.name = 'description';
+          document.head.appendChild(metaDesc);
+        }
+        metaDesc.content = s.description;
+
+        // Canonical Link | 注入规范链接
+        let linkCan = document.querySelector('link[rel="canonical"]');
+        if (!linkCan) {
+          linkCan = document.createElement('link');
+          linkCan.rel = 'canonical';
+          document.head.appendChild(linkCan);
+        }
+        linkCan.href = s.canonical;
+
+        // Favicon | 注入图标
+        const fav = document.getElementById('favicon');
+        if (fav) fav.href = s.favicon;
+      },
+
+      // Manage mobile header visibility | 管理移动端导航可见性
       initScrollInteraction() {
         const header = document.getElementById('ui-header');
-        const logo = document.getElementById('mobile-logo-wrap');
+        const logoWrap = document.getElementById('ui-logo-gif-wrap');
         let isScrolling;
 
         const handleScroll = () => {
-          const isMobile = window.innerWidth <= 768;
-          
-          if (!isMobile) {
-            header.classList.remove('is-nav-hidden');
-            logo.classList.remove('is-nav-hidden');
-            return;
-          }
-
-          header.classList.add('is-nav-hidden');
-          logo.classList.add('is-nav-hidden');
-          
-          window.clearTimeout(isScrolling);
-          isScrolling = setTimeout(() => {
-            if (window.innerWidth <= 768) {
-              header.classList.remove('is-nav-hidden');
-              logo.classList.remove('is-nav-hidden');
-            }
-          }, 250);
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        
-        window.addEventListener('resize', () => {
-          if (window.innerWidth > 768) {
-            header.classList.remove('is-nav-hidden');
-            logo.classList.remove('is-nav-hidden');
+          if (window.innerWidth <= 768) {
+            header.classList.add('is-nav-hidden');
+            logoWrap.classList.add('is-nav-hidden');
             window.clearTimeout(isScrolling);
+            isScrolling = setTimeout(() => {
+              header.classList.remove('is-nav-hidden');
+              logoWrap.classList.remove('is-nav-hidden');
+            }, 250);
           }
-        });
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
       },
 
+      // Apply CSS variables | 应用 CSS 变量
       applyTypography() {
         const root = document.documentElement;
         const t = CONFIG.typography;
@@ -302,17 +361,30 @@
         Object.entries(props).forEach(([k, v]) => root.style.setProperty(k, v));
       },
 
+      // Render Header elements | 渲染页头元素
       renderHeader() {
-        const gif = document.getElementById('ui-gif');
+        const gif = document.getElementById('ui-logo-gif');
+        const text = document.getElementById('ui-logo-text');
         const nav = document.getElementById('ui-nav');
+        
+        text.innerText = CONFIG.header.logo.text;
+        text.href = CONFIG.header.logo.link;
+        
         gif.src = CONFIG.header.logo.gif;
+        gif.onload = () => {
+          gif.style.opacity = "1";
+          text.style.opacity = "0"; 
+        };
         gif.onclick = () => { window.location.href = CONFIG.header.logo.link; };
+
         nav.innerHTML = CONFIG.header.nav.map(n => `<a href="${n.link}" class="fl-nav__link">${n.name}</a>`).join('');
       },
 
+      // Build main grid content | 构建主网格内容
       buildContent() {
         const grid = document.getElementById('ui-main-grid');
         
+        // Build Info Blocks | 构建信息块
         const infoHTML = CONFIG.info.data.map(sec => `
           <div class="fl-info fl-reveal" style="grid-column: span ${sec.span}">
             <b class="fl-info__title">${sec.title}</b>
@@ -320,35 +392,54 @@
           </div>
         `).join('');
 
+        // Build Gallery Items | 构建作品项
         const galleryHTML = CONFIG.gallery.items.map(item => `
           <div class="fl-item-wrapper fl-reveal" style="grid-column: span ${item.span || 12}">
             <div class="type-item-container"><span class="type-item">${item.id}</span></div>
             <div class="fl-cdn-container">
-              <img class="fl-cdn-media" src="${item.src}" onload="this.parentElement.classList.add('is-loaded')" onerror="this.src='https://placehold.co/1200x600/f2f2f2/999?text=Image+Not+Found'">
+              <img class="fl-cdn-media" src="${item.src}" 
+                   onload="this.parentElement.classList.add('is-loaded')" 
+                   onerror="this.src='https://placehold.co/1200x600/f2f2f2/999?text=Image+Not+Found'">
             </div>
           </div>
         `).join('');
 
         grid.innerHTML = infoHTML + galleryHTML;
         this.initReveal();
+        this.initWeChatTrigger();
       },
 
+      // Initialize WeChat Overlay Toggle | 初始化微信遮罩触发
+      initWeChatTrigger() {
+        const trigger = document.getElementById('trigger-wechat');
+        const overlay = document.getElementById('ui-wechat-overlay');
+        if (!trigger || !overlay) return;
+
+        trigger.addEventListener('click', () => {
+          overlay.classList.add('is-active');
+        });
+
+        overlay.addEventListener('click', () => {
+          overlay.classList.remove('is-active');
+        });
+      },
+
+      // Initialize IntersectionObserver for reveal effects | 初始化显现效果的观察器
       initReveal() {
         const observer = new IntersectionObserver((entries) => {
-          const visible = entries.filter(e => e.isIntersecting);
-          visible.forEach((entry, index) => {
-            entry.target.style.transitionDelay = `${index * 0.1}s`;
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
           });
-        }, { 
-          threshold: 0.05, 
-          rootMargin: "0px 0px -20px 0px" 
-        });
+        }, { threshold: 0.05 });
         document.querySelectorAll('.fl-reveal').forEach(el => observer.observe(el));
       },
 
+      // Entry point | 程序入口
       start() {
+        this.initSEO(); // SEO Initialization
         this.applyTypography();
         this.renderHeader();
         this.buildContent();
@@ -356,6 +447,7 @@
       }
     };
 
+    // Bootstrap on load | 加载完成后启动
     window.onload = () => ENGINE.start();
   </script>
 </body>
