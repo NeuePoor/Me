@@ -4,498 +4,392 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <title>Foo | Portfolio</title>
-<!-- SEO Elements will be injected by ENGINE | SEO 元素将由引擎注入 -->
 <link id="favicon" rel="icon" type="image/webp" href="https://folio.neuepoor.com/favicon.webp">
 
 <style>
-  /* ==========================================================================
-     BASE CSS & DYNAMIC TOKENS | 基础样式与动态令牌 [LOCKED]
-     ========================================================================== */
-  :root {
-    --fl-bg: #ffffff;
-    --fl-text: #000000;
-    --fl-gutter: 4px; 
-    --fl-margin: 4px;
-    --fl-nav-h: 60px;
-    --fl-nav-h-m: 35px;
-    --fl-ease: cubic-bezier(0.23, 1, 0.32, 1);
-    --fl-reveal-dist: 30px; 
-    --fl-reveal-dur: 1.2s;  
-    --fl-font-fallback: "Arial", "Helvetica", sans-serif;
-    
-    /* Skeleton Overlays | 骨架屏遮罩 */
-    --fl-skeleton-op: rgba(0,0,0,0.03);
-  }
+/* ==========================================================================
+BASE CSS & DYNAMIC TOKENS | 基础样式与动态令牌 [LOCKED]
+========================================================================== */
+:root {
+--fl-bg: #ffffff;
+--fl-text: #000000;
+--fl-gutter: 4px;
+--fl-margin: 4px;
+--fl-nav-h: 60px;
+--fl-nav-h-m: 35px;
+--fl-ease: cubic-bezier(0.23, 1, 0.32, 1);
+--fl-reveal-dist: 30px;
+--fl-reveal-dur: 1.2s;
+--fl-font-fallback: "Arial", "Helvetica", sans-serif;
+--fl-skeleton-op: rgba(0,0,0,0.03);
+}
 
-  @media (prefers-color-scheme: dark) {
-    :root { 
-      --fl-bg: #000000; 
-      --fl-text: #ffffff; 
-      --fl-skeleton-op: rgba(255,255,255,0.03);
-    }
-  }
+@media (prefers-color-scheme: dark) {
+:root {
+--fl-bg: #000000;
+--fl-text: #ffffff;
+--fl-skeleton-op: rgba(255,255,255,0.03);
+}
+}
 
-  * { 
-    box-sizing: border-box; 
-    -webkit-tap-highlight-color: transparent; 
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-osx-font-smoothing: grayscale;
-  }
-  
-  html, body {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    user-select: none;
-    height: 100%;
-  }
-  html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
+html, body { scrollbar-width: none; -ms-overflow-style: none; user-select: none; height: 100%; margin: 0; padding: 0; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
-  body { 
-    margin: 0; padding: 0; 
-    font-family: var(--fl-font-fallback);
-    background: var(--fl-bg); 
-    color: var(--fl-text);
-    overflow-x: hidden; 
-    line-height: 1.4;
-  }
+body {
+font-family: var(--fl-font-fallback);
+background: var(--fl-bg);
+color: var(--fl-text);
+overflow-x: hidden;
+line-height: 1.4;
+/* Patch: Smooth background transition */
+transition: background-color 0.25s ease-out;
+}
 
-  /* Grid Layout | 网格布局 [LOCKED] */
-  .fl-grid {
-    display: grid; 
-    grid-template-columns: repeat(12, 1fr);
-    gap: var(--fl-gutter); 
-    margin: var(--fl-margin);
-    padding: 80px 0 120px;
-    transform: translateZ(0);
-  }
+/* Grid & Reveal Logic [LOCKED] */
+.fl-grid {
+display: grid;
+grid-template-columns: repeat(12, 1fr);
+gap: var(--fl-gutter);
+margin: var(--fl-margin);
+padding: 80px 0 120px;
+transform: translateZ(0);
+}
 
-  /* Reveal Animation | 显现动画 [LOCKED] */
-  .fl-reveal {
-    opacity: 0;
-    transform: translateY(var(--fl-reveal-dist));
-    transition: 
-      opacity var(--fl-reveal-dur) var(--fl-ease), 
-      transform var(--fl-reveal-dur) var(--fl-ease);
-    will-change: transform, opacity;
-  }
-  .fl-reveal.is-visible { opacity: 1; transform: translateY(0); }
+.fl-reveal {
+opacity: 0;
+transform: translateY(var(--fl-reveal-dist));
+transition: opacity var(--fl-reveal-dur) var(--fl-ease), transform var(--fl-reveal-dur) var(--fl-ease);
+will-change: transform, opacity;
+}
+.fl-reveal.is-visible { opacity: 1; transform: translateY(0); }
 
-  /* ==========================================================================
-     COMPONENT: HEADER & LOGO | 组件：页头与标识 [LOCKED]
-     ========================================================================== */
-  .fl-logo__gif-wrap {
-    position: fixed; top: 0; left: 4px; height: var(--fl-nav-h);
-    display: flex; align-items: center; z-index: 1001; 
-    /* Optimization: Limit transitions to transform and opacity | 优化：限制过渡属性 */
-    transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
-    will-change: transform, opacity;
-  }
-  
-  .fl-logo__gif { 
-    height: var(--logo-size-pc); 
-    width: auto; cursor: pointer; opacity: 0; 
-    mix-blend-mode: normal; 
-    transition: opacity 0.3s var(--fl-ease); 
-  }
-  
-  .fl-logo__gif:hover { opacity: 0.7 !important; }
+/* ==========================================================================
+COMPONENT: HEADER & LOGO (STATIC LOAD) [LOCKED]
+========================================================================== */
+.fl-logo__gif-wrap {
+position: fixed; top: 0; left: 4px; height: var(--fl-nav-h);
+display: flex; align-items: center; z-index: 1001;
+transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
+}
+.fl-logo__gif {
+height: var(--logo-size-pc);
+width: auto; cursor: pointer; opacity: 0;
+transition: opacity 0.3s var(--fl-ease);
+}
+.fl-logo__gif:hover { opacity: 0.7 !important; }
 
-  .fl-header {
-    position: fixed; width: 100%; z-index: 999;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 4px; height: var(--fl-nav-h); top: 0;
-    mix-blend-mode: difference; 
-    transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
-    will-change: transform, opacity;
-  }
+.fl-header {
+position: fixed; width: 100%; z-index: 999;
+display: flex; justify-content: space-between; align-items: center;
+padding: 0 4px; height: var(--fl-nav-h); top: 0;
+mix-blend-mode: difference;
+transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
+}
 
-  .fl-logo-text {
-    text-decoration: none; color: #fff;
-    font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
-    transition: opacity 0.3s var(--fl-ease);
-    /* Boundary protection for mobile | 移动端边界保护 */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 180px;
-  }
-  .fl-logo-text:hover { opacity: 0.7; }
+.fl-logo-text {
+text-decoration: none; color: #fff;
+font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
+transition: opacity 0.3s var(--fl-ease);
+opacity: 0; 
+}
 
-  .fl-nav { display: flex; gap: 40px; }
-  .fl-nav__link {
-    font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
-    color: #fff; text-decoration: none; transition: opacity 0.3s var(--fl-ease);
-  }
-  .fl-nav__link:hover { opacity: 0.7; }
+.fl-nav { display: flex; gap: 40px; }
+.fl-nav__link {
+font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
+color: #fff; text-decoration: none; transition: opacity 0.3s var(--fl-ease);
+}
+.fl-nav__link:hover { opacity: 0.7; }
 
-  /* Mobile Logic | 移动端交互逻辑 [LOCKED] */
-  @media (max-width: 768px) {
-    .is-nav-hidden { transform: translateY(80px); opacity: 0; pointer-events: none; }
-    .fl-grid { padding: 4px 0 120px; }
-    .fl-logo__gif-wrap { top: auto; bottom: 12px; left: 28px; height: var(--fl-nav-h-m); }
-    .fl-logo__gif { height: var(--logo-size-m); }
-    .fl-header {
-      top: auto; bottom: 12px; left: 12px;
-      width: calc(100% - 24px); height: var(--fl-nav-h-m);
-      padding: 0 16px; border-radius: 12px; 
-      mix-blend-mode: normal; 
-      background: rgba(255, 255, 255, 0.65); 
-      backdrop-filter: blur(40px) saturate(200%); 
-      -webkit-backdrop-filter: blur(40px) saturate(200%);
-      border: 0.5px solid rgba(0,0,0,0.05);
-    }
-    @media (prefers-color-scheme: dark) {
-      .fl-header { background: rgba(20, 20, 20, 0.75); border: 0.5px solid rgba(255,255,255,0.05); }
-    }
-    .fl-nav__link, .fl-logo-text { font-size: var(--header-fs-m); color: var(--fl-text); } 
-    .fl-logo-text { max-width: 120px; }
-  }
+/* Mobile Logic [LOCKED] */
+@media (max-width: 768px) {
+.is-nav-hidden { transform: translateY(80px); opacity: 0; pointer-events: none; }
+.fl-grid { padding: 4px 0 120px; }
+.fl-logo__gif-wrap { top: auto; bottom: 12px; left: 28px; height: var(--fl-nav-h-m); }
+.fl-logo__gif { height: var(--logo-size-m); }
+.fl-header {
+top: auto; bottom: 12px; left: 12px;
+width: calc(100% - 24px); height: var(--fl-nav-h-m);
+padding: 0 16px; border-radius: 12px;
+mix-blend-mode: normal;
+background: rgba(255, 255, 255, 0.65);
+backdrop-filter: blur(40px) saturate(200%);
+-webkit-backdrop-filter: blur(40px) saturate(200%);
+border: 0.5px solid rgba(0,0,0,0.05);
+}
+@media (prefers-color-scheme: dark) {
+.fl-header { background: rgba(20, 20, 20, 0.75); border: 0.5px solid rgba(255,255,255,0.05); }
+}
+.fl-nav__link, .fl-logo-text { font-size: var(--header-fs-m); color: var(--fl-text); }
 
-  /* ==========================================================================
-     COMPONENT: CDN ENGINE & ANTI-THEFT | CDN 引擎与版权保护 [LOCKED]
-     ========================================================================== */
-  .fl-cdn-container { 
-    position: relative; width: 100%; overflow: hidden; 
-    display: flex; align-items: center; justify-content: center;
-    transform: translateZ(0); min-height: 200px;
-    user-select: none; -webkit-user-drag: none;
-    background-color: var(--fl-bg); 
-  }
-  
-  .fl-cdn-media { 
-    width: 100%; height: auto; display: block; 
-    opacity: 0.05; 
-    filter: blur(40px) scale(1.05); 
-    transition: opacity 1.2s var(--fl-ease), filter 1.2s var(--fl-ease);
-    object-fit: cover; 
-    z-index: 2;
-    will-change: filter, opacity;
-  }
-  
-  .is-loaded .fl-cdn-media { 
-    opacity: 1; 
-    filter: blur(0) scale(1);
-  }
+/* Patch: Mobile Interaction Optimization */
+.fl-cdn-shield { pointer-events: none; }
+.fl-cdn-media { -webkit-touch-callout: none; user-select: none; }
+}
 
-  .fl-cdn-container::after { 
-    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-    background: linear-gradient(90deg, transparent, var(--fl-skeleton-op), transparent); 
-    transform: translateX(-100%); animation: skeleton-wave 2s infinite; 
-    z-index: 5;
-  }
-  .is-loaded.fl-cdn-container::after { display: none; }
-  @keyframes skeleton-wave { 100% { transform: translateX(100%); } }
+/* ==========================================================================
+COMPONENT: INFO & GALLERY [SIZE SENSITIVE]
+========================================================================== */
+.fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--fl-text); opacity: 0.8; }
+.fl-info__title { display: block; margin-bottom: 4.2em; font-weight: normal; }
 
-  /* Anti-Theft Shield | 版权遮断层 */
-  .fl-cdn-shield {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 10; background: transparent;
-    cursor: default; pointer-events: auto;
-  }
-  
-  /* Optimization: Shield behavior on mobile | 优化：移动端遮断层行为 */
-  @media (max-width: 768px) {
-    .fl-cdn-shield { pointer-events: none; }
-  }
+/* Link Styles: No underline, 0.7 opacity on hover */
+.fl-info a, .trigger-wechat { 
+  color: inherit; 
+  text-decoration: none; 
+  border-bottom: none; 
+  transition: opacity 0.3s var(--fl-ease); 
+  cursor: pointer;
+}
+.fl-info a:hover, .trigger-wechat:hover { opacity: 0.7; }
 
-  .fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--info-color); opacity: 0.8; }
-  .fl-info__title { display: block; margin-bottom: 4.2em; font-weight: normal; }
-  
-  .fl-info a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: opacity 0.3s var(--fl-ease); }
-  .fl-info a:hover { opacity: 0.6; }
-  .fl-info .trigger-wechat { cursor: pointer; }
+.fl-item-wrapper { position: relative; display: flex; flex-direction: column; }
+.type-item-container { 
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+  display: flex; align-items: center; justify-content: center; 
+  mix-blend-mode: difference; z-index: 20; pointer-events: none; 
+}
+.type-item { 
+  font-family: var(--gallery-font); font-size: var(--gallery-fs); 
+  color: #fff; opacity: 0; transform: translateY(5px); 
+  transition: all 0.4s var(--fl-ease); 
+}
+.fl-item-wrapper:hover .type-item { opacity: 1; transform: translateY(0); }
 
-  /* ==========================================================================
-     GALLERY & ARCHIVE | 展示与归档 [EDITABLE]
-     ========================================================================== */
-  .fl-item-wrapper { position: relative; display: flex; flex-direction: column; }
-  .type-item { font-family: var(--gallery-font); font-size: var(--gallery-fs); font-weight: var(--gallery-fw); color: var(--gallery-color); }
+/* CDN Engine Style [LOCKED] */
+.fl-cdn-container {
+position: relative; width: 100%; overflow: hidden;
+display: flex; align-items: center; justify-content: center;
+min-height: 200px; background-color: var(--fl-bg);
+/* Patch: Smooth background transition */
+transition: background-color 0.25s ease-out;
+}
+.fl-cdn-media {
+width: 100%; height: auto; display: block; opacity: 0.1;
+filter: blur(40px) scale(1.05); transition: opacity 1.2s var(--fl-ease), filter 1.2s var(--fl-ease);
+object-fit: cover; z-index: 2;
+}
+.is-loaded .fl-cdn-media { opacity: 1; filter: blur(0) scale(1); }
+.fl-cdn-container::after {
+content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+background: linear-gradient(90deg, transparent, var(--fl-skeleton-op), transparent);
+transform: translateX(-100%); animation: skeleton-wave 2s infinite; z-index: 5;
+}
+.is-loaded.fl-cdn-container::after { display: none; }
+@keyframes skeleton-wave { 100% { transform: translateX(100%); } }
 
-  @media (min-width: 769px) {
-    .type-item-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; mix-blend-mode: difference; z-index: 20; pointer-events: none; }
-    .type-item { color: #fff; opacity: 0; transform: translateY(5px); transition: all 0.4s var(--fl-ease); }
-    .fl-item-wrapper:hover .type-item { opacity: 1; transform: translateY(0); }
-  }
+.fl-cdn-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: default; }
 
-  /* ==========================================================================
-     OVERLAY: WECHAT | 叠加层：微信 [LOCKED]
-     ========================================================================== */
-  .fl-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 2000; opacity: 0; pointer-events: none;
-    transition: opacity 0.4s var(--fl-ease);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  }
-  .fl-overlay.is-active { opacity: 1; pointer-events: auto; }
-  .fl-overlay img { max-width: 300px; width: 80%; height: auto; transform: scale(0.9); transition: transform 0.5s var(--fl-ease); }
-  .fl-overlay.is-active img { transform: scale(1); }
+/* Overlay WeChat [LOCKED] */
+.fl-overlay {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center;
+z-index: 2000; opacity: 0; pointer-events: none;
+transition: opacity 0.4s var(--fl-ease); backdrop-filter: blur(10px);
+}
+.fl-overlay.is-active { opacity: 1; pointer-events: auto; }
+.fl-overlay img { max-width: 300px; width: 80%; transform: scale(0.9); transition: transform 0.5s var(--fl-ease); }
+.fl-overlay.is-active img { transform: scale(1); }
 </style>
 </head>
 <body>
 
-  <!-- Logo GIF Layer [LOCKED] -->
-  <div class="fl-logo__gif-wrap" id="ui-logo-gif-wrap">
-    <img class="fl-logo__gif" id="ui-logo-gif" alt="Logo" draggable="false">
-  </div>
+<div class="fl-logo__gif-wrap" id="ui-logo-gif-wrap">
+<img class="fl-logo__gif" id="ui-logo-gif" alt="Logo" draggable="false">
+</div>
 
-  <!-- Main Header [LOCKED] -->
-  <header class="fl-header" id="ui-header">
-    <a href="https://neuepoor.com" class="fl-logo-text" id="ui-logo-text">Foo</a>
-    <nav class="fl-nav" id="ui-nav"></nav>
-  </header>
+<header class="fl-header" id="ui-header">
+<a href="https://neuepoor.com" class="fl-logo-text" id="ui-logo-text">Foo</a>
+<nav class="fl-nav" id="ui-nav"></nav>
+</header>
 
-  <!-- Content Grid -->
-  <main class="fl-grid" id="ui-main-grid"></main>
+<main class="fl-grid" id="ui-main-grid"></main>
 
-  <!-- WeChat Overlay [LOCKED] -->
-  <div class="fl-overlay" id="ui-wechat-overlay">
-    <img src="https://folio.neuepoor.com/wechatsuckboyz.svg" alt="WeChat QR Code" draggable="false">
-  </div>
+<div class="fl-overlay" id="ui-wechat-overlay">
+<img src="https://folio.neuepoor.com/wechatsuckboyz.svg" alt="WeChat QR Code" draggable="false">
+</div>
 
-  <script>
-    /**
-     * CONFIG v4.6.4
-     * Dual-Language Rules & State Locking
-     */
-    const CONFIG = {
-      version: "4.6.4",
-      seo: { 
-        _lock: true,
-        title: "Foo", 
-        description: "Portfolio of Foo - Designer with focus on Visual Identities and Digital Experiences.",
-        canonical: "http://fo.neuepoor.com",
-        favicon: "https://folio.neuepoor.com/favicon.webp" 
-      },
-      typography: {
-        _lock: true,
-        header: { font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "21px", color: "#ffffff" },
-        info: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" },
-        gallery: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" }
-      },
-      header: {
-        _lock: true,
-        logo: { 
-          gif: "https://folio.neuepoor.com/logo.gif", 
-          link: "https://neuepoor.com", 
-          text: "Foo",
-          sizePC: "32px", 
-          sizeMobile: "18px" 
-        },
-        nav: [
-          { name: 'Works', link: 'https://fo.neuepoor.com/works' }, 
-          { name: '(Play)', link: 'https://fo.neuepoor.com/play' }, 
-          { name: 'Me', link: 'https://fo.neuepoor.com/me' }
-        ]
-      },
-      info: {
-        _lock: true,
-        data: [
-          { title: "Works", content: "Branding<br>Vision identity<br>Look Book<br>Interface<br>Packaging<br>Editorial<br>Apparel", span: 6 },
-          { title: "Service", content: "Creative Direction<br>Art Direction<br>Graphic<br>Illustration<br>Motion<br>Typeface", span: 4 },
-          { title: "Contacts", content: `
-            <a href="mailto:poorleaglguy@qq.com">Email</a><br>
-            <a href="https://www.instagram.com/neuepoor" target="_blank">Instagram</a><br>
-            <a href="https://github.com/NeuePoor" target="_blank">Github</a><br>
-            <a href="https://xhslink.com/m/9qPnrun1Dh9" target="_blank">小红书</a><br>
-            <span class="trigger-wechat" id="trigger-wechat">Wechat</span>
-          `, span: 2 }
-        ]
-      },
-      gallery: {
-        _editable: true,
-        items: [
-          { id: "02001", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" },
-          { id: "02002", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-3.png" },
-          { id: "02003", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-4.png" },
-          { id: "02004", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-6.png" },
-          { id: "02005", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-7.png" }
-        ]
-      },
-      archive: { _editable: true, items: [] }
-    };
+<script>
+/**
+* CONFIG v4.6.7 [LOCKED]
+*/
+const CONFIG = {
+version: "4.6.7",
+seo: {
+_lock: true,
+title: "Foo",
+description: "Portfolio of Foo - I'm a multi-disciplinary designer with focus on Graphic&Illustration, Creative Direction, Branding, Visual Identities, Packaging, Website, and Print& Editorial Design. My work experience in various industries has enriched my design methods.",
+canonical: "http://fo.neuepoor.com",
+favicon: "https://folio.neuepoor.com/favicon.webp"
+},
+typography: {
+_lock: true,
+header: { font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "21px", color: "#ffffff" },
+info: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" },
+gallery: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" }
+},
+header: {
+_lock: true,
+logo: { gif: "https://folio.neuepoor.com/logo.gif", link: "https://neuepoor.com", text: "Foo", sizePC: "32px", sizeMobile: "18px" },
+nav: [
+{ name: 'Works', link: 'https://fo.neuepoor.com/works' },
+{ name: '(Play)', link: 'https://fo.neuepoor.com/play' },
+{ name: 'Me', link: 'https://fo.neuepoor.com/me' }
+]
+},
+info: {
+_lock: true,
+data: [
+{ title: "Works", content: "Branding<br>Vision identity<br>Look Book<br>Interface<br>Packaging<br>Editorial<br>Apparel", span: 6 },
+{ title: "Service", content: "Creative Direction<br>Art Direction<br>Graphic<br>Illustration<br>Motion<br>Typeface", span: 4 },
+{ title: "Contacts", content: `
+<a href="mailto:poorleaglguy@qq.com">Email</a><br>
+<a href="https://www.instagram.com/neuepoor" target="_blank">Instagram</a><br>
+<a href="https://github.com/NeuePoor" target="_blank">Github</a><br>
+<a href="https://xhslink.com/m/9qPnrun1Dh9" target="_blank">小红书</a><br>
+<span class="trigger-wechat" id="trigger-wechat">Wechat</span>
+`, span: 2 }
+]
+},
+gallery: {
+_editable: true,
+items: [
+{ id: "02001", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" },
+{ id: "02002", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-3.png" },
+{ id: "02003", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-4.png" },
+{ id: "02004", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-6.png" },
+{ id: "02005", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-7.png" }
+]
+}
+};
 
-    /**
-     * ENGINE [LOCKED] | 核心引擎
-     */
-    const ENGINE = {
-      initSEO() {
-        const s = CONFIG.seo;
-        document.title = s.title;
-        const fav = document.getElementById('favicon');
-        if (fav) fav.href = s.favicon;
-      },
+/**
+* ENGINE [LOCKED]
+*/
+const ENGINE = {
+initSEO() {
+const s = CONFIG.seo;
+document.title = s.title;
+const fav = document.getElementById('favicon');
+if (fav) fav.href = s.favicon;
+},
 
-      renderMedia(src) {
-        if (!src) return '';
-        const ext = src.split('.').pop().toLowerCase();
-        const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
-        const isAudio = ['mp3', 'wav', 'ogg'].includes(ext);
-        const commonAttrs = `class="fl-cdn-media" draggable="false" oncontextmenu="return false;"`;
-        
-        if (isVideo) {
-          return `
-            <div class="fl-cdn-container">
-              <div class="fl-cdn-shield" oncontextmenu="event.preventDefault();"></div>
-              <video ${commonAttrs} muted loop playsinline webkit-playsinline autoplay preload="auto"
-                x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portrait">
-                <source src="${src}" type="video/${ext === 'mov' ? 'quicktime' : ext}">
-              </video>
-            </div>`;
-        } else if (isAudio) {
-          return `<div class="fl-cdn-container"><audio ${commonAttrs} controls preload="metadata"><source src="${src}" type="audio/mpeg"></audio></div>`;
-        } else {
-          return `<div class="fl-cdn-container"><div class="fl-cdn-shield"></div><img ${commonAttrs} src="${src}" loading="lazy" decoding="async"></div>`;
-        }
-      },
+renderMedia(src) {
+if (!src) return '';
+const ext = src.split('.').pop().toLowerCase();
+const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
+const commonAttrs = `class="fl-cdn-media" draggable="false" oncontextmenu="return false;"`;
+let mediaTag = isVideo 
+? `<video ${commonAttrs} muted loop playsinline autoplay x5-video-player-type="h5"><source src="${src}"></video>`
+: `<img ${commonAttrs} src="${src}" loading="lazy" alt="Material">`;
 
-      // Optimization: rAF Scroll Interaction | 优化：rAF 滚动交互
-      initScrollInteraction() {
-        const header = document.getElementById('ui-header');
-        const logoWrap = document.getElementById('ui-logo-gif-wrap');
-        let isScrolling = false;
-        let ticking = false;
+return `<div class="fl-cdn-container"><div class="fl-cdn-shield" oncontextmenu="event.preventDefault();"></div>${mediaTag}</div>`;
+},
 
-        const updateHeader = () => {
-          if (isScrolling) {
-            header.classList.add('is-nav-hidden');
-            logoWrap.classList.add('is-nav-hidden');
-          } else {
-            header.classList.remove('is-nav-hidden');
-            logoWrap.classList.remove('is-nav-hidden');
-          }
-          ticking = false;
-        };
+applyTypography() {
+const root = document.documentElement;
+const t = CONFIG.typography;
+const l = CONFIG.header.logo;
+const props = {
+'--header-font': t.header.font, '--header-fw': t.header.weight, '--header-fs': t.header.sizePC, '--header-fs-m': t.header.sizeMobile,
+'--info-font': t.info.font, '--info-fw': t.info.weight, '--info-fs': t.info.sizePC,
+'--gallery-font': t.gallery.font, '--gallery-fs': t.gallery.sizePC,
+'--logo-size-pc': l.sizePC, '--logo-size-m': l.sizeMobile
+};
+Object.entries(props).forEach(([k, v]) => root.style.setProperty(k, v));
+},
 
-        let scrollTimer = null;
-        window.addEventListener('scroll', () => {
-          if (window.innerWidth > 768) return;
-          isScrolling = true;
-          if (!ticking) {
-            requestAnimationFrame(updateHeader);
-            ticking = true;
-          }
-          clearTimeout(scrollTimer);
-          scrollTimer = setTimeout(() => {
-            isScrolling = false;
-            requestAnimationFrame(updateHeader);
-          }, 250);
-        }, { passive: true });
-      },
+renderHeader() {
+const gif = document.getElementById('ui-logo-gif');
+const text = document.getElementById('ui-logo-text');
+const nav = document.getElementById('ui-nav');
+text.innerText = CONFIG.header.logo.text;
+gif.src = CONFIG.header.logo.gif;
+gif.onload = () => { gif.style.opacity = "1"; text.style.opacity = "0"; };
+gif.onerror = () => { gif.style.display = "none"; text.style.opacity = "1"; };
+gif.onclick = () => { window.location.href = CONFIG.header.logo.link; };
+nav.innerHTML = CONFIG.header.nav.map(n => `<a href="${n.link}" class="fl-nav__link">${n.name}</a>`).join('');
+},
 
-      // WeChat AutoPlay Singleton | 微信自动播放单例
-      initWeChatPlay() {
-        const triggerPlay = () => {
-          document.querySelectorAll('.fl-cdn-media').forEach(media => {
-            if (media.tagName === 'VIDEO') media.play().catch(() => {});
-          });
-        };
-        if (typeof WeixinJSBridge !== "undefined") {
-          WeixinJSBridge.invoke('getNetworkType', {}, triggerPlay);
-        } else {
-          document.addEventListener("WeixinJSBridgeReady", triggerPlay, { once: true });
-        }
-      },
+buildContent() {
+const grid = document.getElementById('ui-main-grid');
+const infoHTML = CONFIG.info.data.map(sec => `
+<div class="fl-info fl-reveal" style="grid-column: span ${sec.span}">
+<b class="fl-info__title">${sec.title}</b>
+${sec.content}
+</div>`).join('');
 
-      applyTypography() {
-        const root = document.documentElement;
-        const t = CONFIG.typography;
-        const l = CONFIG.header.logo;
-        const props = {
-          '--header-font': t.header.font, '--header-fw': t.header.weight, '--header-fs': t.header.sizePC, '--header-fs-m': t.header.sizeMobile,
-          '--info-font': t.info.font, '--info-fw': t.info.weight, '--info-fs': t.info.sizePC, '--info-color': t.info.color,
-          '--gallery-font': t.gallery.font, '--gallery-fw': t.gallery.weight, '--gallery-fs': t.gallery.sizePC, '--gallery-fs-m': t.gallery.sizeMobile, '--gallery-color': t.gallery.color,
-          '--logo-size-pc': l.sizePC, '--logo-size-m': l.sizeMobile
-        };
-        Object.entries(props).forEach(([k, v]) => root.style.setProperty(k, v));
-      },
+const galleryHTML = CONFIG.gallery.items.map(item => `
+<div class="fl-item-wrapper fl-reveal" style="grid-column: span ${item.span || 12}">
+<div class="type-item-container"><span class="type-item">${item.id}</span></div>
+${this.renderMedia(item.src)}
+</div>`).join('');
 
-      renderHeader() {
-        const gif = document.getElementById('ui-logo-gif');
-        const text = document.getElementById('ui-logo-text');
-        const nav = document.getElementById('ui-nav');
-        text.innerText = CONFIG.header.logo.text;
-        text.href = CONFIG.header.logo.link;
-        gif.src = CONFIG.header.logo.gif;
-        gif.onload = () => { gif.style.opacity = "1"; text.style.opacity = "0"; };
-        gif.onclick = () => { window.location.href = CONFIG.header.logo.link; };
-        nav.innerHTML = CONFIG.header.nav.map(n => `<a href="${n.link}" class="fl-nav__link">${n.name}</a>`).join('');
-      },
+grid.innerHTML = infoHTML + galleryHTML;
+this.initReveal();
+this.initWeChatTrigger();
 
-      buildContent() {
-        const grid = document.getElementById('ui-main-grid');
-        const infoHTML = CONFIG.info.data.map(sec => `
-          <div class="fl-info fl-reveal" style="grid-column: span ${sec.span}">
-            <b class="fl-info__title">${sec.title}</b>
-            ${sec.content}
-          </div>
-        `).join('');
+// Patch: Robust media loading logic
+document.querySelectorAll('.fl-cdn-media').forEach(media => {
+  const container = media.closest('.fl-cdn-container');
+  const markLoaded = () => setTimeout(() => container.classList.add('is-loaded'), 50);
+  
+  if (media.tagName === 'VIDEO') {
+    if (media.readyState >= 3) markLoaded();
+    else media.addEventListener('loadeddata', markLoaded);
+  } else {
+    if (media.complete) markLoaded();
+    else media.addEventListener('load', markLoaded);
+  }
+});
+},
 
-        const galleryHTML = CONFIG.gallery.items.map(item => `
-          <div class="fl-item-wrapper fl-reveal" style="grid-column: span ${item.span || 12}">
-            <div class="type-item-container"><span class="type-item">${item.id}</span></div>
-            ${this.renderMedia(item.src)}
-          </div>
-        `).join('');
+initScrollInteraction() {
+const header = document.getElementById('ui-header');
+const logoWrap = document.getElementById('ui-logo-gif-wrap');
+let isScrolling;
+window.addEventListener('scroll', () => {
+if (window.innerWidth <= 768) {
+header.classList.add('is-nav-hidden'); logoWrap.classList.add('is-nav-hidden');
+window.clearTimeout(isScrolling);
+isScrolling = setTimeout(() => {
+header.classList.remove('is-nav-hidden'); logoWrap.classList.remove('is-nav-hidden');
+}, 250);
+}
+}, { passive: true });
+},
 
-        grid.innerHTML = infoHTML + galleryHTML;
-        
-        // State Machine Optimization | 加载状态机优化
-        document.querySelectorAll('.fl-cdn-media').forEach(media => {
-          const container = media.closest('.fl-cdn-container');
-          const markLoaded = () => {
-            // Use requestAnimationFrame for smoother UI transition | 使用 rAF 确保过渡平滑
-            requestAnimationFrame(() => container.classList.add('is-loaded'));
-          };
+initReveal() {
+const observer = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+entry.target.classList.add('is-visible');
+observer.unobserve(entry.target);
+}
+});
+}, { threshold: 0.05 });
+document.querySelectorAll('.fl-reveal').forEach(el => observer.observe(el));
+},
 
-          if (media.tagName === 'VIDEO') {
-            // Sync check: readyState 3 (HAVE_FUTURE_DATA) or higher | 同步检查：就绪状态是否已达标
-            if (media.readyState >= 3) markLoaded();
-            else media.addEventListener('loadeddata', markLoaded, { once: true });
-          } else if (media.tagName === 'IMG') {
-            // Sync check: complete status | 同步检查：图片是否已加载完成
-            if (media.complete) markLoaded();
-            else media.addEventListener('load', markLoaded, { once: true });
-          }
-          media.addEventListener('error', markLoaded, { once: true });
-        });
+initWeChatTrigger() {
+const trigger = document.getElementById('trigger-wechat');
+const overlay = document.getElementById('ui-wechat-overlay');
+if (trigger && overlay) {
+trigger.onclick = () => overlay.classList.add('is-active');
+overlay.onclick = () => overlay.classList.remove('is-active');
+}
+},
 
-        this.initReveal();
-        this.initWeChatTrigger();
-      },
+start() {
+this.initSEO();
+this.applyTypography();
+this.renderHeader();
+this.buildContent();
+this.initScrollInteraction();
+}
+};
 
-      initWeChatTrigger() {
-        const trigger = document.getElementById('trigger-wechat');
-        const overlay = document.getElementById('ui-wechat-overlay');
-        if (!trigger || !overlay) return;
-        trigger.addEventListener('click', () => overlay.classList.add('is-active'));
-        overlay.addEventListener('click', () => overlay.classList.remove('is-active'));
-      },
-
-      initReveal() {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.05 });
-        document.querySelectorAll('.fl-reveal').forEach(el => observer.observe(el));
-      },
-
-      start() {
-        this.initSEO();
-        this.initWeChatPlay(); // Higher priority for WeChat | 优先初始化微信策略
-        this.applyTypography();
-        this.renderHeader();
-        this.buildContent();
-        this.initScrollInteraction();
-      }
-    };
-
-    window.onload = () => ENGINE.start();
-  </script>
+window.onload = () => ENGINE.start();
+</script>
 </body>
 </html>
