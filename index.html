@@ -142,10 +142,22 @@
      MEDIA & INFO
      ========================================================================== */
   .fl-cdn-container { 
-    position: relative; width: 100%; overflow: hidden; background-color: var(--fl-skeleton-bg); 
-    display: flex; align-items: center; justify-content: center;
-    transform: translateZ(0); 
+    position: relative; 
+    width: 100%; 
+    overflow: hidden; 
+    background-color: transparent; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    transform: translateZ(0);
+    /* 移除固定比例，允许高度自适应 */
+    min-height: 100px; 
   }
+  
+  .fl-cdn-container:not(.is-loaded) {
+    background-color: var(--fl-skeleton-bg);
+  }
+
   .fl-cdn-container::after { 
     content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
     background: linear-gradient(90deg, transparent, var(--fl-skeleton-highlight), transparent); 
@@ -154,7 +166,13 @@
   .is-loaded.fl-cdn-container::after { display: none; }
   @keyframes skeleton-wave { 100% { transform: translateX(100%); } }
 
-  .fl-cdn-media { width: 100%; height: 100%; display: block; object-fit: cover; opacity: 0; transition: opacity 0.5s var(--fl-ease); }
+  .fl-cdn-media { 
+    width: 100%; 
+    height: auto; /* 关键：高度根据宽度缩放自适应 */
+    display: block; 
+    opacity: 0; 
+    transition: opacity 0.5s var(--fl-ease); 
+  }
   .is-loaded .fl-cdn-media { opacity: 1; }
 
   .fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--info-color); opacity: 0.8; }
@@ -164,6 +182,7 @@
   .type-item { font-family: var(--gallery-font); font-size: var(--gallery-fs); font-weight: var(--gallery-fw); color: var(--gallery-color); }
 
   @media (min-width: 769px) {
+    /* 如果高度自适应，标签位置需要保持在容器中心或根据需要调整 */
     .type-item-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; mix-blend-mode: difference; z-index: 20; pointer-events: none; }
     .type-item { color: #fff; opacity: 0; transform: translateY(5px); transition: all 0.4s var(--fl-ease); }
     .fl-item-wrapper:hover .type-item { opacity: 1; transform: translateY(0); }
@@ -187,21 +206,29 @@
 
   <script>
     /**
-     * CONFIG v4.5.2
+     * CONFIG v4.5.8
+     * 第一性原则：除标注为 _editable: true 的区域外，
+     * 未经用户显式指令，禁止 AI 修改任何标记为 _lock: true 的配置项。
      */
     const CONFIG = {
-      version: "4.5.2",
-      seo: { title: "Folio | Optimized System", favicon: "https://folio.neuepoor.com/Favicon.webp" },
+      version: "4.5.8",
+      seo: { 
+        _lock: true,
+        title: "Folio | Optimized System", 
+        favicon: "https://folio.neuepoor.com/Favicon.webp" 
+      },
       typography: {
+        _lock: true,
         header: { font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "21px", color: "#ffffff" },
         info: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" },
         gallery: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" }
       },
       header: {
+        _lock: true,
         logo: { gif: "https://folio.neuepoor.com/logo.gif", link: "https://fo.neuepoor.com", sizePC: "32px", sizeMobile: "18px" },
         nav: [{ name: 'Works', link: '#' }, { name: '(Play)', link: '#' }, { name: 'Me', link: '#' }]
       },
-      // [LOCK] Info Section - CONTENT LOCKED
+      // [LOCK] Info Section - 禁止修改
       info: {
         _lock: true,
         data: [
@@ -210,17 +237,21 @@
           { title: "Contacts", content: "Email<br>Instagram<br>Github<br>小红书<br>Wechat", span: 2 }
         ]
       },
+      // [EDITABLE] Gallery Section - 可调区域
+      // 更新：移除了 ratio，由图片内容自然撑开高度
       gallery: {
+        _editable: true,
         items: [
-          { id: "02001", span: 12, ratio: "16/9", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" },
-          { id: "02002", span: 6, ratio: "1/1", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" },
-          { id: "02003", span: 6, ratio: "1/1", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" }
+          { id: "02001", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" },
+          { id: "02002", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-3.png" },
+          { id: "02003", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-4.png" },
+          { id: "02004", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-6.png" },
+          { id: "02005", span: 12, src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-7.png" }
         ]
       }
     };
 
     const ENGINE = {
-      // 优化后的滚动逻辑：支持实时响应式切换
       initScrollInteraction() {
         const header = document.getElementById('ui-header');
         const logo = document.getElementById('mobile-logo-wrap');
@@ -230,19 +261,16 @@
           const isMobile = window.innerWidth <= 768;
           
           if (!isMobile) {
-            // 如果是在 PC 端，确保清除所有可能的隐藏类名
             header.classList.remove('is-nav-hidden');
             logo.classList.remove('is-nav-hidden');
             return;
           }
 
-          // 移动端逻辑
           header.classList.add('is-nav-hidden');
           logo.classList.add('is-nav-hidden');
           
           window.clearTimeout(isScrolling);
           isScrolling = setTimeout(() => {
-            // 只有在还是移动端的情况下才恢复显示
             if (window.innerWidth <= 768) {
               header.classList.remove('is-nav-hidden');
               logo.classList.remove('is-nav-hidden');
@@ -252,7 +280,6 @@
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         
-        // 监听窗口大小变化：当从移动端拉大到 PC 端时立即重置状态
         window.addEventListener('resize', () => {
           if (window.innerWidth > 768) {
             header.classList.remove('is-nav-hidden');
@@ -286,7 +313,6 @@
       buildContent() {
         const grid = document.getElementById('ui-main-grid');
         
-        // 渲染 Info - 严格遵守 LOCKED 标记
         const infoHTML = CONFIG.info.data.map(sec => `
           <div class="fl-info fl-reveal" style="grid-column: span ${sec.span}">
             <b class="fl-info__title">${sec.title}</b>
@@ -297,8 +323,8 @@
         const galleryHTML = CONFIG.gallery.items.map(item => `
           <div class="fl-item-wrapper fl-reveal" style="grid-column: span ${item.span || 12}">
             <div class="type-item-container"><span class="type-item">${item.id}</span></div>
-            <div class="fl-cdn-container" style="aspect-ratio: ${item.ratio}">
-              <img class="fl-cdn-media" src="${item.src}" onload="this.parentElement.classList.add('is-loaded')">
+            <div class="fl-cdn-container">
+              <img class="fl-cdn-media" src="${item.src}" onload="this.parentElement.classList.add('is-loaded')" onerror="this.src='https://placehold.co/1200x600/f2f2f2/999?text=Image+Not+Found'">
             </div>
           </div>
         `).join('');
