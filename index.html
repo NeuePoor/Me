@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<title>Folio | Loading...</title>
+<title>Folio | Optimized</title>
 <link id="favicon" rel="icon" type="image/webp" href="">
 
 <style>
@@ -18,8 +18,8 @@
     --fl-nav-h: 60px;
     --fl-nav-h-m: 35px;
     --fl-ease: cubic-bezier(0.23, 1, 0.32, 1);
-    --fl-reveal-dist: 20px;
-    --fl-reveal-dur: 0.8s;
+    --fl-reveal-dist: 30px; 
+    --fl-reveal-dur: 1.2s;  
     --fl-font-fallback: "Arial", "Helvetica", sans-serif;
     
     /* Skeleton Colors */
@@ -36,12 +36,18 @@
     }
   }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   
   html, body {
     scrollbar-width: none;
     -ms-overflow-style: none;
     user-select: none;
+    height: 100%;
   }
   html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
@@ -50,8 +56,7 @@
     font-family: var(--fl-font-fallback);
     background: var(--fl-bg); 
     color: var(--fl-text);
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden; min-height: 100vh; 
+    overflow-x: hidden; 
     line-height: 1.4;
   }
 
@@ -61,141 +66,119 @@
     gap: var(--fl-gutter); 
     margin: var(--fl-margin);
     padding: 80px 0 120px;
+    transform: translateZ(0);
   }
 
   /* ==========================================================================
-     COMPONENT: LOGO GIF OVERLAY
+     COMPONENT: REVEAL
+     ========================================================================== */
+  .fl-reveal {
+    opacity: 0;
+    transform: translateY(var(--fl-reveal-dist));
+    transition: 
+      opacity var(--fl-reveal-dur) var(--fl-ease), 
+      transform var(--fl-reveal-dur) var(--fl-ease);
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  .fl-reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  /* ==========================================================================
+     COMPONENT: LOGO & HEADER
      ========================================================================== */
   .fl-logo__gif-wrap {
-    position: fixed;
-    top: 0;
-    left: 4px;
-    height: var(--fl-nav-h);
-    display: flex;
-    align-items: center;
-    z-index: 1001; 
-    pointer-events: auto;
-    mix-blend-mode: normal; 
+    position: fixed; top: 0; left: 4px; height: var(--fl-nav-h);
+    display: flex; align-items: center; z-index: 1001; 
+    transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
   }
+  .fl-logo__gif { height: var(--logo-size-pc); width: auto; cursor: pointer; transition: opacity 0.3s; }
 
-  .fl-logo__gif { 
-    height: 48px; 
-    width: auto; 
-    display: block; 
-    cursor: pointer;
-    transition: opacity 0.3s var(--fl-ease);
-  }
-
-  .fl-logo__gif:hover {
-    opacity: 0.7;
-  }
-
-  /* ==========================================================================
-     COMPONENT: HEADER
-     ========================================================================== */
   .fl-header {
     position: fixed; width: 100%; z-index: 999;
     display: flex; justify-content: space-between; align-items: center;
     padding: 0 4px; height: var(--fl-nav-h); top: 0;
     mix-blend-mode: difference; 
-  }
-
-  .fl-logo { height: 100%; display: flex; align-items: center; text-decoration: none; color: inherit; }
-  
-  .fl-logo__text {
-    font-family: var(--header-font);
-    font-size: var(--header-fs);
-    font-weight: var(--header-fw);
-    color: #fff; 
-    letter-spacing: -0.05em;
-    text-decoration: none;
-    transition: opacity 0.3s;
-    display: none; 
+    transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
   }
 
   .fl-nav { display: flex; gap: 40px; }
   .fl-nav__link {
-    font-family: var(--header-font);
-    font-size: var(--header-fs);
-    font-weight: var(--header-fw);
-    color: #fff;
-    text-decoration: none;
-    transition: opacity 0.3s;
+    font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
+    color: #fff; text-decoration: none; transition: opacity 0.3s;
   }
-  .fl-nav__link:hover { opacity: 0.3; }
 
+  /* ==========================================================================
+     MOBILE ONLY INTERACTION
+     ========================================================================== */
   @media (max-width: 768px) {
+    .is-nav-hidden { 
+      transform: translateY(80px); 
+      opacity: 0; 
+      pointer-events: none; 
+    }
+    
     .fl-grid { padding: 4px 0 120px; }
-    .fl-logo__gif-wrap { top: auto; bottom: 12px; left: 28px; height: var(--fl-nav-h-m); mix-blend-mode: normal; }
-    .fl-logo__gif { height: 18px; }
+    .fl-logo__gif-wrap { top: auto; bottom: 12px; left: 28px; height: var(--fl-nav-h-m); }
+    .fl-logo__gif { height: var(--logo-size-m); }
     .fl-header {
       top: auto; bottom: 12px; left: 12px;
       width: calc(100% - 24px); height: var(--fl-nav-h-m);
       padding: 0 16px; border-radius: 12px; 
       mix-blend-mode: normal; 
-      background: rgba(255, 255, 255, 0.75); 
-      backdrop-filter: blur(20px) saturate(180%); 
-      border: 0.5px solid rgba(0,0,0,0.08);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      background: rgba(255, 255, 255, 0.65); 
+      backdrop-filter: blur(40px) saturate(200%); 
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      border: 0.5px solid rgba(0,0,0,0.05);
     }
     @media (prefers-color-scheme: dark) {
-      .fl-header { background: rgba(28, 28, 30, 0.85); border: 0.5px solid rgba(255,255,255,0.1); }
+      .fl-header { background: rgba(20, 20, 20, 0.75); border: 0.5px solid rgba(255,255,255,0.05); }
     }
-    .fl-logo__text, .fl-nav__link { font-size: var(--header-fs-m); color: var(--fl-text); } 
+    .fl-nav__link { font-size: var(--header-fs-m); color: var(--fl-text); } 
   }
 
   /* ==========================================================================
-     COMPONENT: CDN MEDIA RENDERER
+     MEDIA & INFO
      ========================================================================== */
-  .fl-cdn-container {
-    position: relative; width: 100%; overflow: hidden;
-    background-color: var(--fl-skeleton-bg); 
-    border-radius: 0; 
+  .fl-cdn-container { 
+    position: relative; width: 100%; overflow: hidden; background-color: var(--fl-skeleton-bg); 
     display: flex; align-items: center; justify-content: center;
+    transform: translateZ(0); 
   }
-  .fl-cdn-container::after {
-    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, var(--fl-skeleton-highlight), transparent);
-    transform: translateX(-100%); animation: skeleton-wave 1.5s infinite; z-index: 1;
+  .fl-cdn-container::after { 
+    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    background: linear-gradient(90deg, transparent, var(--fl-skeleton-highlight), transparent); 
+    transform: translateX(-100%); animation: skeleton-wave 1.5s infinite; 
   }
-  .fl-cdn-container.is-loaded::after { display: none; }
+  .is-loaded.fl-cdn-container::after { display: none; }
   @keyframes skeleton-wave { 100% { transform: translateX(100%); } }
 
-  .fl-cdn-guard { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: default; background: transparent; }
   .fl-cdn-media { width: 100%; height: 100%; display: block; object-fit: cover; opacity: 0; transition: opacity 0.5s var(--fl-ease); }
   .is-loaded .fl-cdn-media { opacity: 1; }
 
-  .fl-cdn-iframe-wrap { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; }
-  .fl-cdn-iframe-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-
-  /* ==========================================================================
-     INFO & GALLERY
-     ========================================================================= */
   .fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--info-color); opacity: 0.8; }
   .fl-info__title { display: block; margin-bottom: 4.2em; font-weight: normal; }
+
   .fl-item-wrapper { position: relative; display: flex; flex-direction: column; }
   .type-item { font-family: var(--gallery-font); font-size: var(--gallery-fs); font-weight: var(--gallery-fw); color: var(--gallery-color); }
-  .fl-archive-wrapper { grid-column: span 12; margin-top: 40px; }
-  .type-archive { font-family: var(--info-font); font-size: 10px; font-weight: 600; text-decoration: none; color: var(--fl-text); }
-  .fl-reveal { opacity: 0; transform: translateY(var(--fl-reveal-dist)); transition: opacity var(--fl-reveal-dur) var(--fl-ease), transform var(--fl-reveal-dur) var(--fl-ease); }
-  .fl-reveal.is-visible { opacity: 1; transform: translateY(0); }
 
   @media (min-width: 769px) {
     .type-item-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; mix-blend-mode: difference; z-index: 20; pointer-events: none; }
-    .type-item { color: #fff; opacity: 0; transform: translateY(5px); }
+    .type-item { color: #fff; opacity: 0; transform: translateY(5px); transition: all 0.4s var(--fl-ease); }
     .fl-item-wrapper:hover .type-item { opacity: 1; transform: translateY(0); }
   }
 </style>
 </head>
 <body>
 
-  <div class="fl-logo__gif-wrap">
+  <div class="fl-logo__gif-wrap" id="mobile-logo-wrap">
     <img class="fl-logo__gif" id="ui-gif" alt="Logo" draggable="false">
   </div>
 
   <header class="fl-header" id="ui-header">
-    <a href="https://fo.neuepoor.com" class="fl-logo" id="ui-logo">
-      <span class="fl-logo__text" id="ui-logo-text"></span>
+    <a href="https://fo.neuepoor.com" class="fl-logo">
+      <span style="display:none">Foo</span>
     </a>
     <nav class="fl-nav" id="ui-nav"></nav>
   </header>
@@ -204,134 +187,146 @@
 
   <script>
     /**
-     * CONFIG v4.4 - 回退版本，移除 AI，保留 Logo 交互修复
+     * CONFIG v4.5.2
      */
     const CONFIG = {
-      version: "4.4",
-      seo: {
-        title: "Folio | Design System v4.4",
-        favicon: "https://folio.neuepoor.com/Favicon.webp"
-      },
+      version: "4.5.2",
+      seo: { title: "Folio | Optimized System", favicon: "https://folio.neuepoor.com/Favicon.webp" },
       typography: {
         header: { font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "21px", color: "#ffffff" },
         info: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" },
         gallery: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" }
       },
       header: {
-        logo: { gif: "https://folio.neuepoor.com/logo.gif", text: "Foo", link: "https://fo.neuepoor.com" },
-        nav: [
-          { name: 'Works', link: 'https://works.neuepoor.com' },
-          { name: '(Play)', link: 'https://play.neuepoor.com' },
-          { name: 'Me', link: 'https://me.neuepoor.com' }
+        logo: { gif: "https://folio.neuepoor.com/logo.gif", link: "https://fo.neuepoor.com", sizePC: "32px", sizeMobile: "18px" },
+        nav: [{ name: 'Works', link: '#' }, { name: '(Play)', link: '#' }, { name: 'Me', link: '#' }]
+      },
+      // [LOCK] Info Section - CONTENT LOCKED
+      info: {
+        _lock: true,
+        data: [
+          { title: "Works", content: "Branding<br>Vision identity<br>Look Book<br>Interface<br>Packaging<br>Editorial<br>Apparel", span: 6 },
+          { title: "Service", content: "Creative Direction<br>Art Direction<br>Graphic<br>Illustration<br>Motion<br>Typeface", span: 4 },
+          { title: "Contacts", content: "Email<br>Instagram<br>Github<br>小红书<br>Wechat", span: 2 }
         ]
       },
-      info: [
-        { title: "Works", content: "Branding<br>Vision identity<br>Look Book<br>Interface<br>Packaging<br>Editorial<br>Apparel", span: 6 },
-        { title: "Service", content: "Creative Direction<br>Art Direction<br>Graphic<br>Illustration<br>Motion<br>Typeface", span: 4 },
-        { title: "Contacts", content: "Email<br>Instagram<br>Github<br>小红书<br>Wechat", span: 2 }
-      ],
       gallery: {
-        placeholder: "https://via.placeholder.com/1200x800?text=Asset+Unavailable",
         items: [
-          { id: "02001", span: 12, ratio: "auto", type: "image", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png", url: "#" },
-          { id: "02002", span: 12, ratio: "auto", type: "image", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png", url: "#" },
-          { id: "02003", span: 12, ratio: "auto", type: "image", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png", url: "#" },
-          { id: "02004", span: 12, ratio: "auto", type: "image", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png", url: "#" },
-          { id: "02005", span: 12, ratio: "auto", type: "image", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png", url: "#" },
-          { id: "02006", span: 12, ratio: "auto", type: "image", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png", url: "#" },
-          { id: "02007", span: 12, ratio: "auto", type: "image", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png", url: "#" }
+          { id: "02001", span: 12, ratio: "16/9", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" },
+          { id: "02002", span: 6, ratio: "1/1", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" },
+          { id: "02003", span: 6, ratio: "1/1", src: "https://folio.neuepoor.com/works/Quick%20Look%20Example-1.png" }
         ]
-      }
-    };
-
-    /**
-     * CDN COMPONENT
-     */
-    const CDN = {
-      getMediaType(item) {
-        if (item.type) return item.type;
-        const ext = item.src.split('.').pop().toLowerCase();
-        if (['mp4', 'webm', 'mov'].includes(ext)) return 'video';
-        if (item.src.includes('youtube') || item.src.includes('embed')) return 'embed';
-        return 'image';
-      },
-      render(item) {
-        const type = this.getMediaType(item);
-        const ratioStyle = item.ratio && item.ratio !== "auto" ? `aspect-ratio: ${item.ratio};` : "";
-        let mediaHtml = '';
-        switch (type) {
-          case 'video':
-            mediaHtml = `<video class="fl-cdn-media" src="${item.src}" muted loop playsinline autoplay preload="metadata" oncanplay="this.parentElement.classList.add('is-loaded')"></video>`;
-            break;
-          case 'embed':
-            mediaHtml = `<div class="fl-cdn-iframe-wrap"><iframe src="${item.src}" allow="autoplay; fullscreen" loading="lazy"></iframe></div>`;
-            break;
-          default:
-            mediaHtml = `<img class="fl-cdn-media" src="${item.src}" alt="${item.id}" loading="lazy" decoding="async" draggable="false" onload="this.parentElement.classList.add('is-loaded')" onerror="this.src='${CONFIG.gallery.placeholder}'">`;
-        }
-        return `<div class="fl-cdn-container" style="${ratioStyle}">${mediaHtml}<div class="fl-cdn-guard" oncontextmenu="return false;"></div></div>`;
       }
     };
 
     const ENGINE = {
-      applySeo() {
-        if (CONFIG.seo) {
-          document.title = CONFIG.seo.title;
-          const fav = document.getElementById('favicon');
-          if (fav && CONFIG.seo.favicon) fav.href = CONFIG.seo.favicon;
-        }
+      // 优化后的滚动逻辑：支持实时响应式切换
+      initScrollInteraction() {
+        const header = document.getElementById('ui-header');
+        const logo = document.getElementById('mobile-logo-wrap');
+        let isScrolling;
+
+        const handleScroll = () => {
+          const isMobile = window.innerWidth <= 768;
+          
+          if (!isMobile) {
+            // 如果是在 PC 端，确保清除所有可能的隐藏类名
+            header.classList.remove('is-nav-hidden');
+            logo.classList.remove('is-nav-hidden');
+            return;
+          }
+
+          // 移动端逻辑
+          header.classList.add('is-nav-hidden');
+          logo.classList.add('is-nav-hidden');
+          
+          window.clearTimeout(isScrolling);
+          isScrolling = setTimeout(() => {
+            // 只有在还是移动端的情况下才恢复显示
+            if (window.innerWidth <= 768) {
+              header.classList.remove('is-nav-hidden');
+              logo.classList.remove('is-nav-hidden');
+            }
+          }, 250);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        
+        // 监听窗口大小变化：当从移动端拉大到 PC 端时立即重置状态
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 768) {
+            header.classList.remove('is-nav-hidden');
+            logo.classList.remove('is-nav-hidden');
+            window.clearTimeout(isScrolling);
+          }
+        });
       },
+
       applyTypography() {
         const root = document.documentElement;
         const t = CONFIG.typography;
+        const l = CONFIG.header.logo;
         const props = {
           '--header-font': t.header.font, '--header-fw': t.header.weight, '--header-fs': t.header.sizePC, '--header-fs-m': t.header.sizeMobile,
           '--info-font': t.info.font, '--info-fw': t.info.weight, '--info-fs': t.info.sizePC, '--info-color': t.info.color,
-          '--gallery-font': t.gallery.font, '--gallery-fw': t.gallery.weight, '--gallery-fs': t.gallery.sizePC, '--gallery-fs-m': t.gallery.sizeMobile, '--gallery-color': t.gallery.color
+          '--gallery-font': t.gallery.font, '--gallery-fw': t.gallery.weight, '--gallery-fs': t.gallery.sizePC, '--gallery-fs-m': t.gallery.sizeMobile, '--gallery-color': t.gallery.color,
+          '--logo-size-pc': l.sizePC, '--logo-size-m': l.sizeMobile
         };
         Object.entries(props).forEach(([k, v]) => root.style.setProperty(k, v));
       },
+
       renderHeader() {
         const gif = document.getElementById('ui-gif');
-        const text = document.getElementById('ui-logo-text');
         const nav = document.getElementById('ui-nav');
-
         gif.src = CONFIG.header.logo.gif;
-        text.innerText = CONFIG.header.logo.text;
-
-        // Logo GIF 点击跳转
-        gif.onclick = () => {
-          window.location.href = CONFIG.header.logo.link;
-        };
-
-        gif.onload = () => { text.style.display = 'none'; };
-        gif.onerror = () => { gif.style.display = 'none'; text.style.display = 'block'; };
-
+        gif.onclick = () => { window.location.href = CONFIG.header.logo.link; };
         nav.innerHTML = CONFIG.header.nav.map(n => `<a href="${n.link}" class="fl-nav__link">${n.name}</a>`).join('');
       },
+
       buildContent() {
         const grid = document.getElementById('ui-main-grid');
-        const infoHTML = CONFIG.info.map(sec => `<div class="fl-info fl-reveal" style="grid-column: span ${sec.span}"><b class="fl-info__title">${sec.title}</b>${sec.content}</div>`).join('');
-        const galleryHTML = CONFIG.gallery.items.map((item) => `<div class="fl-item-wrapper fl-reveal" style="grid-column: span ${item.span || 12}"><div class="type-item-container"><span class="type-item">${item.id}</span></div>${CDN.render(item)}</div>`).join('');
-        grid.innerHTML = infoHTML + galleryHTML + `<div class="fl-archive-wrapper fl-reveal"><a href="/Archive/index.html" class="type-archive">Archive</a></div>`;
+        
+        // 渲染 Info - 严格遵守 LOCKED 标记
+        const infoHTML = CONFIG.info.data.map(sec => `
+          <div class="fl-info fl-reveal" style="grid-column: span ${sec.span}">
+            <b class="fl-info__title">${sec.title}</b>
+            ${sec.content}
+          </div>
+        `).join('');
+
+        const galleryHTML = CONFIG.gallery.items.map(item => `
+          <div class="fl-item-wrapper fl-reveal" style="grid-column: span ${item.span || 12}">
+            <div class="type-item-container"><span class="type-item">${item.id}</span></div>
+            <div class="fl-cdn-container" style="aspect-ratio: ${item.ratio}">
+              <img class="fl-cdn-media" src="${item.src}" onload="this.parentElement.classList.add('is-loaded')">
+            </div>
+          </div>
+        `).join('');
+
+        grid.innerHTML = infoHTML + galleryHTML;
         this.initReveal();
-        this.applyAntiTheft();
       },
-      applyAntiTheft() {
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.querySelectorAll('img').forEach(img => img.setAttribute('draggable', 'false'));
-      },
+
       initReveal() {
-        const obs = new IntersectionObserver((es) => {
-          es.forEach(e => { if(e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }});
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.fl-reveal').forEach(el => obs.observe(el));
+        const observer = new IntersectionObserver((entries) => {
+          const visible = entries.filter(e => e.isIntersecting);
+          visible.forEach((entry, index) => {
+            entry.target.style.transitionDelay = `${index * 0.1}s`;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        }, { 
+          threshold: 0.05, 
+          rootMargin: "0px 0px -20px 0px" 
+        });
+        document.querySelectorAll('.fl-reveal').forEach(el => observer.observe(el));
       },
+
       start() {
-        this.applySeo();
         this.applyTypography();
         this.renderHeader();
         this.buildContent();
+        this.initScrollInteraction();
       }
     };
 
