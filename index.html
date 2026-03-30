@@ -101,57 +101,80 @@ color: #fff; text-decoration: none; transition: opacity 0.3s var(--fl-ease);
 .fl-nav__link:hover { opacity: 0.7; }
 
 /* ==========================================================================
-MOBILE OVERRIDE PATCH (MAX-WIDTH: 768px)
-========================================================================== */
+   MOBILE & COMPACT OVERRIDE PATCH (v4.8.5 - iOS 26 Material Island)
+   ========================================================================== */
 @media (max-width: 768px) {
+  /* 1. 导航隐藏动画逻辑同步 */
   .is-nav-hidden { transform: translateY(100px) !important; opacity: 0; pointer-events: none; }
   .fl-grid { padding: 4px 0 120px; }
 
-  /* 1. 重构底栏容器：对标 Safari 原生尺寸 */
+  /* 2. [岛屿模式]：核心容器重构 (iOS 26 风格) */
   .fl-header {
     top: auto !important;
-    bottom: 20px !important;    /* 悬浮位置 */
-    left: 16px !important;      /* 原生宽度/侧边距 */
-    width: calc(100% - 32px) !important;
-    height: 44px !important;    /* 物理高度 */
+    bottom: 24px !important;    /* 确认：悬浮高度 */
+    left: 32px !important;      /* 确认：-64px 宽度对应左右边距 */
+    width: calc(100% - 64px) !important; 
+    height: 44px !important;    /* 确认：物理高度 */
     
-    padding: 0 16px !important; /* 维持内部呼吸感 */
+    padding: 0 16px !important; /* 维持：内部紧凑感 */
+    border-radius: 12px !important; /* 确认：圆角不动 */
     
-    border-radius: 12px !important;
-    background: rgba(255, 255, 255, 0.72) !important;
+    /* 核心修改：锁定混合模式，采用语义化材质 */
+    mix-blend-mode: normal !important; 
+    background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(30px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-    border: 0.5px solid rgba(0,0,0,0.08) !important;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.05) !important;
-    mix-blend-mode: normal !important; /* 移动端背景增强不建议差值模式 */
+    border: 0.5px solid rgba(0,0,0,0.1) !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+    transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease), background 0.3s ease;
   }
 
+  /* 3. 深色模式适配：语义化颜色切换 */
   @media (prefers-color-scheme: dark) {
     .fl-header { 
-      background: rgba(20, 20, 20, 0.75) !important; 
-      border: 0.5px solid rgba(255,255,255,0.08) !important; 
+      background: rgba(20, 20, 20, 0.8) !important; 
+      border: 0.5px solid rgba(255,255,255,0.1) !important; 
     }
   }
 
-  /* 2. 同步 Logo 包裹层位置 */
+  /* 4. 同步 Logo 岛屿位移与垂直居中 */
   .fl-logo__gif-wrap {
     top: auto !important;
-    bottom: 20px !important;
-    left: 32px !important;      /* 16px外边距 + 16px内边距 */
-    height: 44px !important;    /* 垂直居中对齐 */
+    bottom: 24px !important;
+    left: 48px !important;      /* 32px外边距 + 16px内边距 */
+    height: 44px !important;
+  }
+
+  /* 5. 强制移动端文字颜色：适配 Normal 模式 */
+  .fl-nav__link, .fl-logo-text { 
+    font-size: var(--header-fs-m) !important; 
+    color: var(--fl-text) !important; /* 锁定为主题文字色，不再跟随差值变化 */
   }
 
   .fl-logo__gif { height: var(--logo-size-m) !important; }
-  .fl-nav__link, .fl-logo-text { font-size: var(--header-fs-m) !important; color: var(--fl-text) !important; }
+  .fl-nav { gap: 20px !important; } /* 岛屿内间距优化 */
 
-  /* 3. 导航项微调 */
-  .fl-nav {
-    gap: 32px !important;       /* 略微收紧 */
-  }
-
-  /* 4. 移动端交互优化 */
+  /* 6. 移动端交互优化 */
   .fl-cdn-shield { pointer-events: none; }
   .fl-cdn-media { -webkit-touch-callout: none; user-select: none; }
+}
+
+/* 7. [微缩模式]：针对极窄屏幕 (<350px) 的自愈策略 */
+@media (max-width: 350px) {
+  :root {
+    --header-fs-m: 17px !important; /* 缩小字号 */
+  }
+  .fl-header {
+    left: 16px !important;       /* 边距回退，增加空间 */
+    width: calc(100% - 32px) !important; 
+    padding: 0 12px !important; 
+    bottom: 16px !important; 
+  }
+  .fl-logo__gif-wrap {
+    left: 28px !important; 
+    bottom: 16px !important;
+  }
+  .fl-nav { gap: 12px !important; }
 }
 
 /* ==========================================================================
