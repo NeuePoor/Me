@@ -42,7 +42,6 @@ background: var(--fl-bg);
 color: var(--fl-text);
 overflow-x: hidden;
 line-height: 1.4;
-/* Patch: Smooth background transition */
 transition: background-color 0.25s ease-out;
 }
 
@@ -101,39 +100,66 @@ color: #fff; text-decoration: none; transition: opacity 0.3s var(--fl-ease);
 }
 .fl-nav__link:hover { opacity: 0.7; }
 
-/* Mobile Logic [LOCKED] */
+/* ==========================================================================
+MOBILE OVERRIDE PATCH (MAX-WIDTH: 768px)
+========================================================================== */
 @media (max-width: 768px) {
-.is-nav-hidden { transform: translateY(80px); opacity: 0; pointer-events: none; }
-.fl-grid { padding: 4px 0 120px; }
-.fl-logo__gif-wrap { top: auto; bottom: 12px; left: 28px; height: var(--fl-nav-h-m); }
-.fl-logo__gif { height: var(--logo-size-m); }
-.fl-header {
-top: auto; bottom: 12px; left: 12px;
-width: calc(100% - 24px); height: var(--fl-nav-h-m);
-padding: 0 16px; border-radius: 12px;
-mix-blend-mode: normal;
-background: rgba(255, 255, 255, 0.65);
-backdrop-filter: blur(40px) saturate(200%);
--webkit-backdrop-filter: blur(40px) saturate(200%);
-border: 0.5px solid rgba(0,0,0,0.05);
-}
-@media (prefers-color-scheme: dark) {
-.fl-header { background: rgba(20, 20, 20, 0.75); border: 0.5px solid rgba(255,255,255,0.05); }
-}
-.fl-nav__link, .fl-logo-text { font-size: var(--header-fs-m); color: var(--fl-text); }
+  .is-nav-hidden { transform: translateY(100px) !important; opacity: 0; pointer-events: none; }
+  .fl-grid { padding: 4px 0 120px; }
 
-/* Patch: Mobile Interaction Optimization */
-.fl-cdn-shield { pointer-events: none; }
-.fl-cdn-media { -webkit-touch-callout: none; user-select: none; }
+  /* 1. 重构底栏容器：对标 Safari 原生尺寸 */
+  .fl-header {
+    top: auto !important;
+    bottom: 20px !important;    /* 悬浮位置 */
+    left: 16px !important;      /* 原生宽度/侧边距 */
+    width: calc(100% - 32px) !important;
+    height: 44px !important;    /* 物理高度 */
+    
+    padding: 0 16px !important; /* 维持内部呼吸感 */
+    
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border: 0.5px solid rgba(0,0,0,0.08) !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05) !important;
+    mix-blend-mode: normal !important; /* 移动端背景增强不建议差值模式 */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .fl-header { 
+      background: rgba(20, 20, 20, 0.75) !important; 
+      border: 0.5px solid rgba(255,255,255,0.08) !important; 
+    }
+  }
+
+  /* 2. 同步 Logo 包裹层位置 */
+  .fl-logo__gif-wrap {
+    top: auto !important;
+    bottom: 20px !important;
+    left: 32px !important;      /* 16px外边距 + 16px内边距 */
+    height: 44px !important;    /* 垂直居中对齐 */
+  }
+
+  .fl-logo__gif { height: var(--logo-size-m) !important; }
+  .fl-nav__link, .fl-logo-text { font-size: var(--header-fs-m) !important; color: var(--fl-text) !important; }
+
+  /* 3. 导航项微调 */
+  .fl-nav {
+    gap: 32px !important;       /* 略微收紧 */
+  }
+
+  /* 4. 移动端交互优化 */
+  .fl-cdn-shield { pointer-events: none; }
+  .fl-cdn-media { -webkit-touch-callout: none; user-select: none; }
 }
 
 /* ==========================================================================
-COMPONENT: INFO & GALLERY [SIZE SENSITIVE]
+COMPONENT: INFO & GALLERY
 ========================================================================== */
 .fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--fl-text); opacity: 0.8; }
 .fl-info__title { display: block; margin-bottom: 4.2em; font-weight: normal; }
 
-/* Link Styles: No underline, 0.7 opacity on hover */
 .fl-info a, .trigger-wechat { 
   color: inherit; 
   text-decoration: none; 
@@ -156,12 +182,10 @@ COMPONENT: INFO & GALLERY [SIZE SENSITIVE]
 }
 .fl-item-wrapper:hover .type-item { opacity: 1; transform: translateY(0); }
 
-/* CDN Engine Style [LOCKED] */
 .fl-cdn-container {
 position: relative; width: 100%; overflow: hidden;
 display: flex; align-items: center; justify-content: center;
 min-height: 200px; background-color: var(--fl-bg);
-/* Patch: Smooth background transition */
 transition: background-color 0.25s ease-out;
 }
 .fl-cdn-media {
@@ -180,7 +204,6 @@ transform: translateX(-100%); animation: skeleton-wave 2s infinite; z-index: 5;
 
 .fl-cdn-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: default; }
 
-/* Overlay WeChat [LOCKED] */
 .fl-overlay {
 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
 background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center;
@@ -306,7 +329,10 @@ const nav = document.getElementById('ui-nav');
 text.innerText = CONFIG.header.logo.text;
 gif.src = CONFIG.header.logo.gif;
 gif.onload = () => { gif.style.opacity = "1"; text.style.opacity = "0"; };
-gif.onerror = () => { gif.style.display = "none"; text.style.opacity = "1"; };
+gif.onerror = () => { 
+  gif.style.display = "none"; 
+  text.style.setProperty('opacity', '1', 'important'); 
+};
 gif.onclick = () => { window.location.href = CONFIG.header.logo.link; };
 nav.innerHTML = CONFIG.header.nav.map(n => `<a href="${n.link}" class="fl-nav__link">${n.name}</a>`).join('');
 },
@@ -329,7 +355,6 @@ grid.innerHTML = infoHTML + galleryHTML;
 this.initReveal();
 this.initWeChatTrigger();
 
-// Patch: Robust media loading logic
 document.querySelectorAll('.fl-cdn-media').forEach(media => {
   const container = media.closest('.fl-cdn-container');
   const markLoaded = () => setTimeout(() => container.classList.add('is-loaded'), 50);
