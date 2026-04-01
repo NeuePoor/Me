@@ -101,94 +101,101 @@ color: #fff; text-decoration: none; transition: opacity 0.3s var(--fl-ease);
 .fl-nav__link:hover { opacity: 0.7; }
 
 /* ==========================================================================
-   MOBILE & COMPACT OVERRIDE PATCH (v4.8.5 - iOS 26 Material Island)
+   FINAL UI PATCH: iOS 26 AIR-GLASS ISLAND (v4.9.5)
+   特性：空气感材质 / 阶梯响应式 / 旧设备自动降级 / 深浅模式动态适配
    ========================================================================== */
 @media (max-width: 768px) {
-  /* 1. 导航隐藏动画逻辑同步 */
+  /* 基础动画与全局布局同步 */
   .is-nav-hidden { transform: translateY(100px) !important; opacity: 0; pointer-events: none; }
   .fl-grid { padding: 4px 0 120px; }
 
-  /* 2. [岛屿模式]：核心容器重构 (iOS 26 风格) */
+  /* 1. [岛屿模式核心容器] */
   .fl-header {
     top: auto !important;
-    bottom: 24px !important;    /* 确认：悬浮高度 */
-    left: 32px !important;      /* 确认：-64px 宽度对应左右边距 */
+    bottom: 24px !important;    /* 悬浮高度 */
+    left: 32px !important;      /* 左右 32px 系统级边距 */
     width: calc(100% - 64px) !important; 
-    height: 44px !important;    /* 确认：物理高度 */
+    height: 44px !important;    /* iOS 标准触控高度 */
+    padding: 0 16px !important; 
+    border-radius: 12px !important; 
     
-    padding: 0 16px !important; /* 维持：内部紧凑感 */
-    border-radius: 12px !important; /* 确认：圆角不动 */
-    
-    /* 核心修改：锁定混合模式，采用语义化材质 */
-    mix-blend-mode: normal !important; 
-    background: rgba(255, 255, 255, 0.75) !important;
-    backdrop-filter: blur(30px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-    border: 0.5px solid rgba(0,0,0,0.1) !important;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+    mix-blend-mode: normal !important; /* 强制隔离 PC 端差值模式 */
     transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease), background 0.3s ease;
+
+    /* --- 降级策略：针对不支持毛玻璃的老旧设备，默认使用高不透明度实体背景 --- */
+    background: rgba(255, 255, 255, 0.95) !important; 
+    border: 0.5px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
   }
 
-  /* 3. 深色模式适配：语义化颜色切换 */
-  @media (prefers-color-scheme: dark) {
-    .fl-header { 
-      background: rgba(20, 20, 20, 0.8) !important; 
-      border: 0.5px solid rgba(255,255,255,0.1) !important; 
+  /* --- 增强策略：利用特性检测，为现代设备开启 iOS 26 "Pure Glass" 空气感方案 --- */
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .fl-header {
+      background: rgba(255, 255, 255, 0.2) !important; /* 核心：0.2 极低不透明度空气材质 */
+      backdrop-filter: blur(16px) saturate(160%) !important;
+      -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+      box-shadow: none !important; /* 纯净玻璃质感，无需阴影 */
+      border: 0.5px solid rgba(0, 0, 0, 0.05) !important;
     }
   }
 
-  /* 4. 同步 Logo 岛屿位移与垂直居中 */
+  /* 2. 深色模式适配（含降级逻辑） */
+  @media (prefers-color-scheme: dark) {
+    .fl-header { 
+      background: rgba(28, 28, 30, 0.98) !important; /* 旧设备深色降级 */
+    }
+    @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+      .fl-header {
+        background: rgba(28, 28, 30, 0.45) !important; /* 现代设备深色空气材质：45% 浓度 */
+        border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+      }
+    }
+  }
+
+  /* 3. 同步 Logo 岛屿位移 */
   .fl-logo__gif-wrap {
     top: auto !important;
     bottom: 24px !important;
     left: 48px !important;      /* 32px外边距 + 16px内边距 */
-    height: 44px !important;
+    height: 44px !important;    /* 垂直居中对齐 */
   }
 
-  /* 5. 强制移动端文字颜色：适配 Normal 模式 */
+  /* 4. 文本与图标适配：锁定语义化主题色 */
   .fl-nav__link, .fl-logo-text { 
     font-size: var(--header-fs-m) !important; 
-    color: var(--fl-text) !important; /* 锁定为主题文字色，不再跟随差值变化 */
+    color: var(--fl-text) !important; 
   }
 
   .fl-logo__gif { height: var(--logo-size-m) !important; }
-  .fl-nav { gap: 20px !important; } /* 岛屿内间距优化 */
-
-  /* 6. 移动端交互优化 */
+  .fl-nav { gap: 20px !important; } /* 内部间距紧凑化 */
   .fl-cdn-shield { pointer-events: none; }
-  .fl-cdn-media { -webkit-touch-callout: none; user-select: none; }
 }
 
-/* 7. [微缩模式]：针对极窄屏幕 (<350px) 的自愈策略 */
+/* 5. [微缩自愈断点：针对极窄屏幕 <350px] */
 @media (max-width: 350px) {
-  :root {
-    --header-fs-m: 17px !important; /* 缩小字号 */
-  }
+  :root { --header-fs-m: 17px !important; } /* 降级字号防止挤压 */
   .fl-header {
-    left: 16px !important;       /* 边距回退，增加空间 */
+    left: 16px !important;       /* 边距回退 16px，扩大可用空间 */
     width: calc(100% - 32px) !important; 
     padding: 0 12px !important; 
-    bottom: 16px !important; 
+    bottom: 16px !important;     /* 降低高度适配小屏感 */
   }
-  .fl-logo__gif-wrap {
-    left: 28px !important; 
-    bottom: 16px !important;
+  .fl-logo__gif-wrap { 
+    left: 28px !important;       /* 16px外 + 12px内 */
+    bottom: 16px !important; 
   }
   .fl-nav { gap: 12px !important; }
 }
 
 /* ==========================================================================
-COMPONENT: INFO & GALLERY
+COMPONENT: INFO & GALLERY [LOCKED-STRUCTURE]
 ========================================================================== */
 .fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--fl-text); opacity: 0.8; }
 .fl-info__title { display: block; margin-bottom: 4.2em; font-weight: normal; }
 
 .fl-info a, .trigger-wechat { 
-  color: inherit; 
-  text-decoration: none; 
-  border-bottom: none; 
-  transition: opacity 0.3s var(--fl-ease); 
-  cursor: pointer;
+  color: inherit; text-decoration: none; border-bottom: none; 
+  transition: opacity 0.3s var(--fl-ease); cursor: pointer;
 }
 .fl-info a:hover, .trigger-wechat:hover { opacity: 0.7; }
 
@@ -257,14 +264,14 @@ transition: opacity 0.4s var(--fl-ease); backdrop-filter: blur(10px);
 
 <script>
 /**
-* CONFIG v4.6.7 [LOCKED]
+* CONFIG v4.6.8 [LOCKED]
 */
 const CONFIG = {
-version: "4.6.7",
+version: "4.6.8",
 seo: {
 _lock: true,
 title: "Foo",
-description: "Portfolio of Foo - I'm a multi-disciplinary designer with focus on Graphic&Illustration, Creative Direction, Branding, Visual Identities, Packaging, Website, and Print& Editorial Design. My work experience in various industries has enriched my design methods.",
+description: "Portfolio of Foo - I'm a multi-disciplinary designer with focus on Graphic&Illustration, Creative Direction, Branding, Visual Identities, Packaging, Website, and Print& Editorial Design.",
 canonical: "http://fo.neuepoor.com",
 favicon: "https://folio.neuepoor.com/favicon.webp"
 },
