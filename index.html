@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <title>Foo | Portfolio</title>
 <link id="favicon" rel="icon" type="image/webp" href="https://folio.neuepoor.com/favicon.webp">
+<link rel="stylesheet" href="/assets/css/header.css">
 
 <style>
 /* ==========================================================================
@@ -64,151 +65,27 @@ will-change: transform, opacity;
 .fl-reveal.is-visible { opacity: 1; transform: translateY(0); }
 
 /* ==========================================================================
-COMPONENT: HEADER & LOGO (STATIC LOAD) [LOCKED]
-========================================================================== */
-.fl-logo__gif-wrap {
-position: fixed; top: 0; left: 4px; height: var(--fl-nav-h);
-display: flex; align-items: center; z-index: 1001;
-transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
-}
-.fl-logo__gif {
-height: var(--logo-size-pc);
-width: auto; cursor: pointer; opacity: 0;
-transition: opacity 0.3s var(--fl-ease);
-}
-.fl-logo__gif:hover { opacity: 0.7 !important; }
-
-.fl-header {
-position: fixed; width: 100%; z-index: 999;
-display: flex; justify-content: space-between; align-items: center;
-padding: 0 4px; height: var(--fl-nav-h); top: 0;
-mix-blend-mode: difference;
-transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
-}
-
-.fl-logo-text {
-text-decoration: none; color: #fff;
-font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
-transition: opacity 0.3s var(--fl-ease);
-opacity: 0; 
-}
-
-.fl-nav { display: flex; gap: 40px; }
-.fl-nav__link {
-font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
-color: #fff; text-decoration: none; transition: opacity 0.3s var(--fl-ease);
-}
-.fl-nav__link:hover { opacity: 0.7; }
-
-/* ==========================================================================
-   FINAL UI PATCH: iOS 26 AIR-GLASS ISLAND (v4.9.5)
-   特性：空气感材质 / 阶梯响应式 / 旧设备自动降级 / 深浅模式动态适配
-   ========================================================================== */
-@media (max-width: 768px) {
-  /* 基础动画与全局布局同步 */
-  .is-nav-hidden { transform: translateY(100px) !important; opacity: 0; pointer-events: none; }
-  .fl-grid { padding: 4px 0 120px; }
-
-  /* 1. [岛屿模式核心容器] */
-  .fl-header {
-    top: auto !important;
-    bottom: 24px !important;    /* 悬浮高度 */
-    left: 32px !important;      /* 左右 32px 系统级边距 */
-    width: calc(100% - 64px) !important; 
-    height: 44px !important;    /* iOS 标准触控高度 */
-    padding: 0 16px !important; 
-    border-radius: 12px !important; 
-    
-    mix-blend-mode: normal !important; /* 强制隔离 PC 端差值模式 */
-    transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease), background 0.3s ease;
-
-    /* --- 降级策略：针对不支持毛玻璃的老旧设备，默认使用高不透明度实体背景 --- */
-    background: rgba(255, 255, 255, 0.95) !important; 
-    border: 0.5px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-  }
-
-  /* --- 增强策略：利用特性检测，为现代设备开启 iOS 26 "Pure Glass" 空气感方案 --- */
-  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-    .fl-header {
-      background: rgba(255, 255, 255, 0.2) !important; /* 核心：0.2 极低不透明度空气材质 */
-      backdrop-filter: blur(16px) saturate(160%) !important;
-      -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
-      box-shadow: none !important; /* 纯净玻璃质感，无需阴影 */
-      border: 0.5px solid rgba(0, 0, 0, 0.05) !important;
-    }
-  }
-
-  /* 2. 深色模式适配（含降级逻辑） */
-  @media (prefers-color-scheme: dark) {
-    .fl-header { 
-      background: rgba(28, 28, 30, 0.98) !important; /* 旧设备深色降级 */
-    }
-    @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-      .fl-header {
-        background: rgba(28, 28, 30, 0.45) !important; /* 现代设备深色空气材质：45% 浓度 */
-        border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
-      }
-    }
-  }
-
-  /* 3. 同步 Logo 岛屿位移 */
-  .fl-logo__gif-wrap {
-    top: auto !important;
-    bottom: 24px !important;
-    left: 48px !important;      /* 32px外边距 + 16px内边距 */
-    height: 44px !important;    /* 垂直居中对齐 */
-  }
-
-  /* 4. 文本与图标适配：锁定语义化主题色 */
-  .fl-nav__link, .fl-logo-text { 
-    font-size: var(--header-fs-m) !important; 
-    color: var(--fl-text) !important; 
-  }
-
-  .fl-logo__gif { height: var(--logo-size-m) !important; }
-  .fl-nav { gap: 20px !important; } /* 内部间距紧凑化 */
-  .fl-cdn-shield { pointer-events: none; }
-}
-
-/* 5. [微缩自愈断点：针对极窄屏幕 <350px] */
-@media (max-width: 350px) {
-  :root { --header-fs-m: 17px !important; } /* 降级字号防止挤压 */
-  .fl-header {
-    left: 16px !important;       /* 边距回退 16px，扩大可用空间 */
-    width: calc(100% - 32px) !important; 
-    padding: 0 12px !important; 
-    bottom: 16px !important;     /* 降低高度适配小屏感 */
-  }
-  .fl-logo__gif-wrap { 
-    left: 28px !important;       /* 16px外 + 12px内 */
-    bottom: 16px !important; 
-  }
-  .fl-nav { gap: 12px !important; }
-}
-
-/* ==========================================================================
 COMPONENT: INFO & GALLERY [LOCKED-STRUCTURE]
 ========================================================================== */
 .fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--fl-text); opacity: 0.8; }
 .fl-info__title { display: block; margin-bottom: 4.2em; font-weight: normal; }
 
-.fl-info a, .trigger-wechat { 
-  color: inherit; text-decoration: none; border-bottom: none; 
-  transition: opacity 0.3s var(--fl-ease); cursor: pointer;
+.fl-info a, .trigger-wechat {
+color: inherit; text-decoration: none; border-bottom: none;
+transition: opacity 0.3s var(--fl-ease); cursor: pointer;
 }
 .fl-info a:hover, .trigger-wechat:hover { opacity: 0.7; }
 
 .fl-item-wrapper { position: relative; display: flex; flex-direction: column; }
-.type-item-container { 
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-  display: flex; align-items: center; justify-content: center; 
-  mix-blend-mode: difference; z-index: 20; pointer-events: none; 
+.type-item-container {
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+display: flex; align-items: center; justify-content: center;
+mix-blend-mode: difference; z-index: 20; pointer-events: none;
 }
-.type-item { 
-  font-family: var(--gallery-font); font-size: var(--gallery-fs); 
-  color: #fff; opacity: 0; transform: translateY(5px); 
-  transition: all 0.4s var(--fl-ease); 
+.type-item {
+font-family: var(--gallery-font); font-size: var(--gallery-fs);
+color: #fff; opacity: 0; transform: translateY(5px);
+transition: all 0.4s var(--fl-ease);
 }
 .fl-item-wrapper:hover .type-item { opacity: 1; transform: translateY(0); }
 
@@ -332,7 +209,7 @@ if (!src) return '';
 const ext = src.split('.').pop().toLowerCase();
 const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
 const commonAttrs = `class="fl-cdn-media" draggable="false" oncontextmenu="return false;"`;
-let mediaTag = isVideo 
+let mediaTag = isVideo
 ? `<video ${commonAttrs} muted loop playsinline autoplay x5-video-player-type="h5"><source src="${src}"></video>`
 : `<img ${commonAttrs} src="${src}" loading="lazy" alt="Material">`;
 
@@ -353,15 +230,16 @@ Object.entries(props).forEach(([k, v]) => root.style.setProperty(k, v));
 },
 
 renderHeader() {
+// 已迁移到 header.module.js，此函数保留但不直接执行
 const gif = document.getElementById('ui-logo-gif');
 const text = document.getElementById('ui-logo-text');
 const nav = document.getElementById('ui-nav');
 text.innerText = CONFIG.header.logo.text;
 gif.src = CONFIG.header.logo.gif;
 gif.onload = () => { gif.style.opacity = "1"; text.style.opacity = "0"; };
-gif.onerror = () => { 
-  gif.style.display = "none"; 
-  text.style.setProperty('opacity', '1', 'important'); 
+gif.onerror = () => {
+gif.style.display = "none";
+text.style.setProperty('opacity', '1', 'important');
 };
 gif.onclick = () => { window.location.href = CONFIG.header.logo.link; };
 nav.innerHTML = CONFIG.header.nav.map(n => `<a href="${n.link}" class="fl-nav__link">${n.name}</a>`).join('');
@@ -386,16 +264,16 @@ this.initReveal();
 this.initWeChatTrigger();
 
 document.querySelectorAll('.fl-cdn-media').forEach(media => {
-  const container = media.closest('.fl-cdn-container');
-  const markLoaded = () => setTimeout(() => container.classList.add('is-loaded'), 50);
-  
-  if (media.tagName === 'VIDEO') {
-    if (media.readyState >= 3) markLoaded();
-    else media.addEventListener('loadeddata', markLoaded);
-  } else {
-    if (media.complete) markLoaded();
-    else media.addEventListener('load', markLoaded);
-  }
+const container = media.closest('.fl-cdn-container');
+const markLoaded = () => setTimeout(() => container.classList.add('is-loaded'), 50);
+
+if (media.tagName === 'VIDEO') {
+if (media.readyState >= 3) markLoaded();
+else media.addEventListener('loadeddata', markLoaded);
+} else {
+if (media.complete) markLoaded();
+else media.addEventListener('load', markLoaded);
+}
 });
 },
 
@@ -438,7 +316,10 @@ overlay.onclick = () => overlay.classList.remove('is-active');
 start() {
 this.initSEO();
 this.applyTypography();
-this.renderHeader();
+// STEP 3: 修改调用逻辑，使用外部挂载的 mountHeader
+if (window.mountHeader) {
+  window.mountHeader(CONFIG);
+}
 this.buildContent();
 this.initScrollInteraction();
 }
@@ -446,5 +327,6 @@ this.initScrollInteraction();
 
 window.onload = () => ENGINE.start();
 </script>
+<script type="module" src="/assets/js/header.init.js"></script>
 </body>
 </html>
