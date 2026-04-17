@@ -9,7 +9,7 @@
 <style>
 /* ==========================================================================
 BASE CSS & DYNAMIC TOKENS | 基础样式与动态令牌 [LOCKED]
-========================================================================== */
+========================================================================= */
 :root {
 --fl-bg: #ffffff;
 --fl-text: #000000;
@@ -45,39 +45,65 @@ line-height: 1.4;
 transition: background-color 0.25s ease-out;
 }
 
-/* Grid & Reveal Logic [LOCKED] */
+/* ==========================================================================
+    FOCUS MODE [v5.0.1 REINFORCED]
+   ========================================================================== */
+.fl-nav__link, 
+.fl-info-row,
+.fl-info__title,
+.fl-item-wrapper, 
+.fl-logo__gif,
+.fl-cdn-container,
+.back-icon-trigger {
+  transition: filter 0.5s var(--fl-ease), opacity 0.5s var(--fl-ease);
+  will-change: filter;
+}
+
+body.is-focus-mode .fl-nav__link,
+body.is-focus-mode .back-icon-trigger,
+body.is-focus-mode .fl-info-row,
+body.is-focus-mode .fl-info__title,
+body.is-focus-mode .fl-cdn-container {
+  filter: blur(8px) !important;
+  opacity: 0.4 !important;
+}
+
+body.is-focus-mode .fl-nav__link:hover,
+body.is-focus-mode .back-icon-trigger:hover,
+body.is-focus-mode .fl-info-row:hover,
+body.is-focus-mode .fl-info__title:hover,
+body.is-focus-mode .fl-item-wrapper:hover .fl-cdn-container {
+  filter: blur(0) !important;
+  opacity: 1 !important;
+}
+
+/* ==========================================================================
+    LAYOUT & GRID
+   ========================================================================== */
 .fl-grid {
 display: grid;
 grid-template-columns: repeat(12, 1fr);
 gap: var(--fl-gutter);
 margin: var(--fl-margin);
 padding: 80px 0 120px;
-transform: translateZ(0);
 }
 
 .fl-reveal {
 opacity: 0;
 transform: translateY(var(--fl-reveal-dist));
 transition: opacity var(--fl-reveal-dur) var(--fl-ease), transform var(--fl-reveal-dur) var(--fl-ease);
-will-change: transform, opacity;
 }
 .fl-reveal.is-visible { opacity: 1; transform: translateY(0); }
 
 /* ==========================================================================
-COMPONENT: HEADER & LOGO (V4.8.2: OPTIMIZED 0.4s)
-========================================================================== */
+    COMPONENT: HEADER & TRACKS
+   ========================================================================== */
 .fl-logo__gif-wrap {
 position: fixed; top: 0; left: 4px; height: var(--fl-nav-h);
 display: flex; align-items: center; z-index: 1001;
-transition: transform 0.4s var(--fl-ease), opacity 0.4s var(--fl-ease);
-pointer-events: none; 
+transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
 }
-.fl-logo__gif {
-height: var(--logo-size-pc);
-width: auto; cursor: pointer; opacity: 0;
-transition: opacity 0.3s var(--fl-ease);
-pointer-events: auto;
-}
+.fl-logo__gif { height: var(--logo-size-pc); cursor: pointer; opacity: 0; transition: opacity 0.3s var(--fl-ease); }
 .fl-logo__gif:hover { opacity: 0.7 !important; }
 
 .fl-header {
@@ -85,211 +111,160 @@ position: fixed; width: 100%; z-index: 999;
 display: flex; justify-content: space-between; align-items: center;
 padding: 0 4px; height: var(--fl-nav-h); top: 0;
 mix-blend-mode: difference;
-transition: transform 0.4s var(--fl-ease), opacity 0.4s var(--fl-ease);
-pointer-events: auto;
+transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease);
 }
 
 .fl-logo-text {
 text-decoration: none; color: #fff;
 font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
-transition: opacity 0.3s var(--fl-ease);
-opacity: 0;
-display: flex; align-items: center;
-pointer-events: none; 
-cursor: pointer;
+transition: opacity 0.3s var(--fl-ease); opacity: 0; display: flex; align-items: center;
 }
 
 .fl-nav { display: flex; gap: 40px; align-items: center; }
 .fl-nav__link {
 font-family: var(--header-font); font-size: var(--header-fs); font-weight: var(--header-fw);
 color: #fff; text-decoration: none; transition: opacity 0.3s var(--fl-ease);
-cursor: pointer;
 }
 .fl-nav__link:hover { opacity: 0.7; }
 
-/* ==========================================================================
-   SECONDARY TRACK & BACK ICON
-   ========================================================================== */
+/* Secondary Track Logic */
 .secondary-track { 
   position: fixed !important; top: 0; left: 0; width: 100% !important; 
   transform: translateX(100%) !important; opacity: 0; pointer-events: none !important;
-  transition: transform 0.4s var(--fl-ease), opacity 0.4s var(--fl-ease); z-index: 1100;
+  transition: transform 0.6s var(--fl-ease), opacity 0.6s var(--fl-ease); z-index: 1100;
 }
 
 body.is-secondary-active .fl-header:not(.secondary-track),
-body.is-secondary-active .fl-logo__gif-wrap:not(.secondary-track) {
+body.is-secondary-active .fl-logo__gif-wrap {
   transform: translateX(-100%) !important; opacity: 0; pointer-events: none !important;
 }
 
 body.is-secondary-active .secondary-track {
-  transform: translateX(0) !important; opacity: 1; pointer-events: auto !important;
+  transform: translateX(0) !important; opacity: 1 !important; pointer-events: auto !important;
 }
 
 .back-icon-trigger {
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: opacity 0.3s var(--fl-ease);
-  padding: 8px; margin-left: -8px;
-}
-.back-icon-trigger svg {
-  width: 24px; height: 24px; fill: none; stroke: currentColor;
-  stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; color: #fff;
+  cursor: pointer; position: relative; width: var(--header-fs); height: var(--header-fs);
 }
 
+@media (min-width: 769px) {
+  .secondary-track .back-icon-trigger { color: #fff !important; }
+}
+
+.back-icon-trigger::before {
+  content: ""; display: block; width: 10px; height: 10px; 
+  background: currentColor; border-radius: 50%;
+  animation: fl-dot-blink 2s infinite ease-in-out;
+}
+
+@keyframes fl-dot-blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1.0; } }
+
 /* ==========================================================================
-   MOBILE OVERRIDE PATCH (V4.8.2: FIXED INTERACTION)
+    MOBILE PATCH
    ========================================================================== */
 @media (max-width: 768px) {
-  /* 滚动隐藏：统一位移 */
-  .is-nav-hidden { transform: translateY(100px) !important; opacity: 0 !important; pointer-events: none !important; }
-  
+  .is-nav-hidden { transform: translateY(100px) !important; opacity: 0 !important; }
   .fl-grid { padding: 4px 0 120px; }
 
   .fl-logo__gif-wrap {
-    display: flex !important; top: auto !important; bottom: 24px !important;
-    left: 48px !important; height: var(--fl-nav-h-m) !important;
-    z-index: 1005; mix-blend-mode: normal !important;
+    top: auto !important; bottom: 24px !important; left: 48px !important; 
+    height: var(--fl-nav-h-m) !important; z-index: 1005; mix-blend-mode: normal !important;
   }
   .fl-logo__gif { height: var(--logo-size-m) !important; }
 
   .fl-header {
-    top: auto !important; bottom: 24px !important; 
-    left: 32px !important; width: calc(100% - 64px) !important; 
-    height: var(--fl-nav-h-m) !important; padding: 0 16px !important; 
-    border-radius: 12px !important; mix-blend-mode: normal !important; /* 移除混合模式冲突 */
-    background: rgba(255, 255, 255, 0.95) !important; 
+    top: auto !important; bottom: 24px !important; left: 32px !important; 
+    width: calc(100% - 64px) !important; height: var(--fl-nav-h-m) !important; 
+    padding: 0 16px !important; border-radius: 12px !important; mix-blend-mode: normal !important;
+    background: rgba(255, 255, 255, 0.2) !important; backdrop-filter: blur(16px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
     border: 0.5px solid rgba(0, 0, 0, 0.1) !important; z-index: 1000;
   }
 
-  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-    .fl-header {
-      background: rgba(255, 255, 255, 0.2) !important;
-      backdrop-filter: blur(16px) saturate(160%) !important;
-      -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
-    }
-  }
-
   @media (prefers-color-scheme: dark) {
-    .fl-header {
-      background: rgba(28, 28, 30, 0.45) !important;
-      border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
-    }
-    .fl-logo-text, .fl-nav__link, .back-icon-trigger svg { color: var(--fl-text) !important; }
+    .fl-header { background: rgba(28, 28, 30, 0.45) !important; border: 0.5px solid rgba(255, 255, 255, 0.1) !important; }
+    .fl-nav__link, .secondary-track .back-icon-trigger { color: var(--fl-text) !important; }
   }
 
-  /* 修正二级菜单在移动端的激活与隐藏逻辑 */
   .secondary-track {
-    transform: translateY(0) translateX(100%) !important; /* 修正初始水平位移 */
+    transform: translateY(0) translateX(100%) !important;
     left: 32px !important; bottom: 24px !important; top: auto !important; 
     height: var(--fl-nav-h-m) !important; width: calc(100% - 64px) !important; 
-    z-index: 1200; border-radius: 12px !important;
-    mix-blend-mode: normal !important;
   }
-
-  body.is-secondary-active .secondary-track {
-    transform: translateY(0) translateX(0) !important; 
-  }
-
-  /* 激活二级菜单时的滚动隐藏：不再执行水平位移，而是同步垂直位移 */
-  body.is-secondary-active .secondary-track.is-nav-hidden {
-    transform: translateY(100px) !important;
-    opacity: 0 !important;
-  }
-
-  .fl-logo-text { font-size: var(--header-fs-m) !important; color: var(--fl-text) !important; opacity: 0; }
-  .back-icon-trigger svg { color: var(--fl-text) !important; width: 22px; height: 22px; }
+  
+  .back-icon-trigger { color: var(--fl-text) !important; }
   .fl-nav { gap: 20px !important; }
   .fl-nav__link { font-size: var(--header-fs-m) !important; color: var(--fl-text) !important; }
 }
 
-@media (max-width: 350px) {
-  :root { --header-fs-m: 17px !important; }
-  .fl-header, .secondary-track { left: 16px !important; width: calc(100% - 32px) !important; padding: 0 12px !important; bottom: 16px !important; }
-  .fl-logo__gif-wrap { left: 28px !important; bottom: 16px !important; }
-}
-
 /* ==========================================================================
-COMPONENT: GALLERY & OVERLAY [LOCKED]
-========================================================================== */
-.fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); font-weight: var(--info-fw); color: var(--fl-text); opacity: 0.8; }
+    CONTENT STYLES
+   ========================================================================== */
+.fl-info { margin-bottom: 20px; font-family: var(--info-font); font-size: var(--info-fs); color: var(--fl-text); opacity: 0.8; }
 .fl-info__title { display: block; margin-bottom: 4.2em; font-weight: normal; }
-.fl-info a, .trigger-wechat { color: inherit; text-decoration: none; transition: opacity 0.3s var(--fl-ease); cursor: pointer; }
-.fl-info a:hover, .trigger-wechat:hover { opacity: 0.7; }
+.fl-info-row { display: block; }
+.fl-info a { color: inherit; text-decoration: none; transition: opacity 0.3s; }
+.fl-info a:hover { opacity: 0.7; }
 
-.fl-item-wrapper { position: relative; display: flex; flex-direction: column; }
-.type-item-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; mix-blend-mode: difference; z-index: 20; pointer-events: none; }
-.type-item { font-family: var(--gallery-font); font-size: var(--gallery-fs); color: #fff; opacity: 0; transform: translateY(5px); transition: all 0.4s var(--fl-ease); }
-.fl-item-wrapper:hover .type-item { opacity: 1; transform: translateY(0); }
+.fl-item-wrapper { position: relative; }
+.fl-cdn-container { width: 100%; overflow: hidden; background-color: var(--fl-bg); transition: background-color 0.25s; min-height: 200px; }
+.fl-cdn-media { width: 100%; height: auto; display: block; opacity: 0; filter: blur(20px); transition: all 1.2s var(--fl-ease); }
+.is-loaded .fl-cdn-media { opacity: 1; filter: blur(0); }
 
-.fl-cdn-container { position: relative; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 200px; background-color: var(--fl-bg); transition: background-color 0.25s ease-out; }
-.fl-cdn-media { width: 100%; height: auto; display: block; opacity: 0.1; filter: blur(40px) scale(1.05); transition: opacity 1.2s var(--fl-ease), filter 1.2s var(--fl-ease); object-fit: cover; z-index: 2; }
-.is-loaded .fl-cdn-media { opacity: 1; filter: blur(0) scale(1); }
-.fl-cdn-container::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--fl-skeleton-op), transparent); transform: translateX(-100%); animation: skeleton-wave 2s infinite; z-index: 5; }
-.is-loaded.fl-cdn-container::after { display: none; }
-
-.fl-cdn-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: default; }
-
-.fl-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.4s var(--fl-ease); backdrop-filter: blur(10px); }
+.fl-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: 0.4s; backdrop-filter: blur(10px); }
 .fl-overlay.is-active { opacity: 1; pointer-events: auto; }
-.fl-overlay img { max-width: 300px; width: 80%; transform: scale(0.9); transition: transform 0.5s var(--fl-ease); }
-.fl-overlay.is-active img { transform: scale(1); }
 </style>
 </head>
 <body>
 
 <div class="fl-logo__gif-wrap" id="ui-logo-gif-wrap">
-<img class="fl-logo__gif" id="ui-logo-gif" alt="Logo" draggable="false">
+<img class="fl-logo__gif" id="ui-logo-gif" alt="Logo">
 </div>
 
 <header class="fl-header" id="ui-header">
-<a href="https://neuepoor.com" class="fl-logo-text" id="ui-logo-text">Foo</a>
+<a href="#" class="fl-logo-text" id="ui-logo-text">Foo</a>
 <nav class="fl-nav" id="ui-nav"></nav>
 </header>
 
 <header class="fl-header secondary-track" id="ui-secondary-header">
-  <div class="back-icon-trigger" id="ui-back-icon-trigger">
-    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-  </div>
-  <nav class="fl-nav" id="ui-secondary-nav">
-    <a href="#" class="fl-nav__link" id="ui-link-index">Index</a>
-    <a href="#" class="fl-nav__link" id="ui-link-archive">Archive</a>
-  </nav>
+  <div class="back-icon-trigger" id="ui-back-icon-trigger"></div>
+  <nav class="fl-nav" id="ui-secondary-nav"></nav>
 </header>
 
 <main class="fl-grid" id="ui-main-grid"></main>
 
 <div class="fl-overlay" id="ui-wechat-overlay">
-<img src="https://folio.neuepoor.com/wechatsuckboyz.svg" alt="WeChat QR Code" draggable="false">
+<img src="https://folio.neuepoor.com/wechatsuckboyz.svg" alt="WeChat">
 </div>
 
 <script>
 /**
-* CONFIG v4.8.2
+* CONFIG v5.0.1 - DATA RECOVERED
 */
 const CONFIG = {
-version: "4.8.2",
-seo: { _lock: true, title: "Foo", description: "Portfolio of Foo...", canonical: "http://fo.neuepoor.com", favicon: "https://folio.neuepoor.com/favicon.webp" },
+version: "5.0.1",
+seo: { title: "Foo | Portfolio", favicon: "https://folio.neuepoor.com/favicon.webp" },
 typography: {
-  _lock: true,
-  header: { font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "21px", color: "#ffffff" },
-  info: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" },
-  gallery: { font: "Arial, sans-serif", weight: "400", sizePC: "10px", sizeMobile: "10px", color: "inherit" }
+  header: { font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "21px" },
+  info: { font: "Arial, sans-serif", weight: "400", sizePC: "10px" },
+  gallery: { font: "Arial, sans-serif", weight: "400", sizePC: "10px" }
 },
 header: {
-  _lock: true,
   logo: { gif: "https://folio.neuepoor.com/logo.gif", link: "https://neuepoor.com", text: "Foo", sizePC: "32px", sizeMobile: "18px" },
-  nav: [ { name: 'Works', link: '#' }, { name: '(Play)', link: '#' }, { name: 'Me', link: '#' } ],
-  secondary: {
-    "Works": { index: "https://fo.neuepoor.com/works-index", archive: "https://fo.neuepoor.com/works-archive" },
-    "(Play)": { index: "https://fo.neuepoor.com/play-index", archive: "https://fo.neuepoor.com/play-archive" },
-    "Me": { index: "https://fo.neuepoor.com/me-index", archive: "https://fo.neuepoor.com/me-archive" }
-  }
+  secondary: { name: 'Archive', link: 'https://folio.neuepoor.com/archive' },
+  nav: [ 
+    { name: 'Works', link: 'https://works.neuepoor.com', triggerTrack: true }, 
+    { name: '(Play)', link: 'https://play.neuepoor.com', triggerTrack: false }, 
+    { name: 'Me', link: 'https://me.neuepoor.com', triggerTrack: false } 
+  ]
 },
 info: {
   _lock: true,
   data: [
     { title: "Works", content: "Branding<br>Vision identity<br>Look Book<br>Interface<br>Packaging<br>Editorial<br>Apparel", span: 6 },
     { title: "Service", content: "Creative Direction<br>Art Direction<br>Graphic<br>Illustration<br>Motion<br>Typeface", span: 4 },
-    { title: "Contacts", content: `<a href="mailto:poorleaglguy@qq.com">Email</a><br><a href="https://www.instagram.com/neuepoor" target="_blank">Instagram</a><br><a href="https://github.com/NeuePoor" target="_blank">Github</a><br><a href="https://xhslink.com/m/9qPnrun1Dh9" target="_blank">小红书</a><br><span class="trigger-wechat" id="trigger-wechat">Wechat</span>`, span: 2 }
+    { title: "Contacts", content: `<a href="mailto:poorleaglguy@qq.com">Email</a><br><a href="https://www.instagram.com/neuepoor" target="_blank">Instagram</a><br><a href="https://github.com/NeuePoor" target="_blank">Github</a><br><a href="https://xhslink.com/m/9qPnrun1Dh9" target="_blank">小红书</a><br><span id="trigger-wechat" style="cursor:pointer">Wechat</span>`, span: 2 }
   ]
 },
 gallery: {
@@ -305,30 +280,12 @@ gallery: {
 };
 
 const ENGINE = {
-initSEO() {
-  const s = CONFIG.seo; document.title = s.title;
-  const fav = document.getElementById('favicon'); if (fav) fav.href = s.favicon;
-},
-
-renderMedia(src) {
-  if (!src) return '';
-  const ext = src.split('.').pop().toLowerCase();
-  const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
-  const commonAttrs = `class="fl-cdn-media" draggable="false" oncontextmenu="return false;"`;
-  let mediaTag = isVideo 
-  ? `<video ${commonAttrs} muted loop playsinline autoplay x5-video-player-type="h5"><source src="${src}"></video>`
-  : `<img ${commonAttrs} src="${src}" loading="lazy" alt="Material">`;
-  return `<div class="fl-cdn-container"><div class="fl-cdn-shield" oncontextmenu="event.preventDefault();"></div>${mediaTag}</div>`;
-},
-
 applyTypography() {
   const root = document.documentElement;
   const t = CONFIG.typography; const l = CONFIG.header.logo;
   const props = {
     '--header-font': t.header.font, '--header-fw': t.header.weight, '--header-fs': t.header.sizePC, '--header-fs-m': t.header.sizeMobile,
-    '--info-font': t.info.font, '--info-fw': t.info.weight, '--info-fs': t.info.sizePC,
-    '--gallery-font': t.gallery.font, '--gallery-fs': t.gallery.sizePC,
-    '--logo-size-pc': l.sizePC, '--logo-size-m': l.sizeMobile
+    '--info-font': t.info.font, '--info-fs': t.info.sizePC, '--logo-size-pc': l.sizePC, '--logo-size-m': l.sizeMobile
   };
   Object.entries(props).forEach(([k, v]) => root.style.setProperty(k, v));
 },
@@ -337,91 +294,97 @@ renderHeader() {
   const gif = document.getElementById('ui-logo-gif');
   const text = document.getElementById('ui-logo-text');
   const nav = document.getElementById('ui-nav');
+  const secondaryNav = document.getElementById('ui-secondary-nav');
+
   text.innerText = CONFIG.header.logo.text;
   gif.src = CONFIG.header.logo.gif;
-  gif.onload = () => { gif.style.opacity = "1"; text.style.opacity = "0"; text.style.pointerEvents = "none"; };
-  gif.onerror = () => { text.style.opacity = "1"; text.style.pointerEvents = "auto"; };
-  setTimeout(() => { if (getComputedStyle(gif).opacity === "0") { text.style.opacity = "1"; text.style.pointerEvents = "auto"; } }, 3500);
-  gif.onclick = () => { window.location.href = CONFIG.header.logo.link; };
-  text.onclick = () => { if(parseFloat(getComputedStyle(text).opacity) > 0.5) window.location.href = CONFIG.header.logo.link; };
-  nav.innerHTML = CONFIG.header.nav.map(n => `<a href="${n.link}" class="fl-nav__link">${n.name}</a>`).join('');
+  gif.onload = () => { gif.style.opacity = "1"; };
+  
+  nav.innerHTML = CONFIG.header.nav.map(n => 
+    `<a href="${n.link}" class="fl-nav__link" ${n.triggerTrack ? 'data-nav-trigger="true"' : ''}>${n.name}</a>`
+  ).join('');
+
+  secondaryNav.innerHTML = `<a href="${CONFIG.header.secondary.link}" class="fl-nav__link">${CONFIG.header.secondary.name}</a>`;
 },
 
 initSecondaryNav() {
   const body = document.body;
-  const mainLinks = document.querySelectorAll('#ui-nav .fl-nav__link');
   const backIconBtn = document.getElementById('ui-back-icon-trigger');
-  const linkIndex = document.getElementById('ui-link-index');
-  const linkArchive = document.getElementById('ui-link-archive');
 
-  mainLinks.forEach(link => {
-    link.onclick = (e) => {
-      e.preventDefault(); e.stopPropagation();
-      const key = link.innerText.trim();
-      const config = CONFIG.header.secondary[key];
-      if (config) {
-        linkIndex.href = config.index; linkArchive.href = config.archive;
-        body.classList.add('is-secondary-active');
-      }
-    };
+  // 初始加载跳转二级轨道
+  setTimeout(() => { body.classList.add('is-secondary-active'); }, 100);
+
+  // 回到一级轨道
+  backIconBtn.onclick = () => { body.classList.remove('is-secondary-active'); };
+
+  // 点击 triggerTrack 项目切换轨道
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-nav-trigger="true"]');
+    if (trigger) {
+      e.preventDefault();
+      body.classList.add('is-secondary-active');
+    }
   });
-
-  backIconBtn.onclick = (e) => {
-    e.preventDefault(); e.stopPropagation();
-    body.classList.remove('is-secondary-active');
-  };
 },
 
 buildContent() {
   const grid = document.getElementById('ui-main-grid');
-  const infoHTML = CONFIG.info.data.map(sec => `<div class="fl-info fl-reveal" style="grid-column: span ${sec.span}"><b class="fl-info__title">${sec.title}</b>${sec.content}</div>`).join('');
-  const galleryHTML = CONFIG.gallery.items.map(item => `<div class="fl-item-wrapper fl-reveal" style="grid-column: span ${item.span || 12}"><div class="type-item-container"><span class="type-item">${item.id}</span></div>${this.renderMedia(item.src)}</div>`).join('');
+  // 恢复 Info 数据渲染
+  const infoHTML = CONFIG.info.data.map(sec => {
+    const rows = sec.content.split('<br>').map(row => `<span class="fl-info-row">${row}</span>`).join('');
+    return `<div class="fl-info fl-reveal" style="grid-column: span ${sec.span}"><b class="fl-info__title">${sec.title}</b>${rows}</div>`;
+  }).join('');
+  
+  // 恢复 Gallery 全部作品渲染
+  const galleryHTML = CONFIG.gallery.items.map(item => 
+    `<div class="fl-item-wrapper fl-reveal" style="grid-column: span ${item.span || 12}">${this.renderMedia(item.src)}</div>`
+  ).join('');
+  
   grid.innerHTML = infoHTML + galleryHTML;
-  this.initReveal(); this.initWeChatTrigger();
+  
+  this.initReveal();
+  this.initWeChat();
+
   document.querySelectorAll('.fl-cdn-media').forEach(media => {
-    const container = media.closest('.fl-cdn-container');
-    const markLoaded = () => setTimeout(() => container.classList.add('is-loaded'), 50);
-    if (media.tagName === 'VIDEO') { if (media.readyState >= 3) markLoaded(); else media.addEventListener('loadeddata', markLoaded); }
-    else { if (media.complete) markLoaded(); else media.addEventListener('load', markLoaded); }
+    const markLoaded = () => media.closest('.fl-cdn-container').classList.add('is-loaded');
+    if (media.complete) markLoaded(); else media.addEventListener('load', markLoaded);
   });
 },
 
-initScrollInteraction() {
-  const elements = [
-    document.getElementById('ui-header'),
-    document.getElementById('ui-logo-gif-wrap'),
-    document.getElementById('ui-secondary-header')
-  ];
-  
-  let isScrolling;
-  window.addEventListener('scroll', () => {
-    if (window.innerWidth <= 768) {
-      elements.forEach(el => { if(el) el.classList.add('is-nav-hidden'); });
-      
-      window.clearTimeout(isScrolling);
-      isScrolling = setTimeout(() => {
-        elements.forEach(el => { if(el) el.classList.remove('is-nav-hidden'); });
-      }, 250);
-    }
-  }, { passive: true });
+initWeChat() {
+  const trigger = document.getElementById('trigger-wechat');
+  const overlay = document.getElementById('ui-wechat-overlay');
+  if (trigger && overlay) {
+    trigger.onclick = () => overlay.classList.add('is-active');
+    overlay.onclick = () => overlay.classList.remove('is-active');
+  }
+},
+
+renderMedia(src) {
+  return `<div class="fl-cdn-container"><img class="fl-cdn-media" src="${src}" loading="lazy"></div>`;
+},
+
+initFocusMode() {
+  if (window.innerWidth <= 768) return;
+  const body = document.body;
+  const selectors = 'a, .fl-item-wrapper, .fl-logo__gif, .fl-info-row, .fl-nav__link, .fl-info__title, .back-icon-trigger';
+  document.addEventListener('mouseover', (e) => { if (e.target.closest(selectors)) body.classList.add('is-focus-mode'); });
+  document.addEventListener('mouseout', (e) => { if (!e.relatedTarget || !e.relatedTarget.closest(selectors)) body.classList.remove('is-focus-mode'); });
 },
 
 initReveal() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } });
-  }, { threshold: 0.05 });
+  }, { threshold: 0.1 });
   document.querySelectorAll('.fl-reveal').forEach(el => observer.observe(el));
 },
 
-initWeChatTrigger() {
-  const trigger = document.getElementById('trigger-wechat');
-  const overlay = document.getElementById('ui-wechat-overlay');
-  if (trigger && overlay) { trigger.onclick = () => overlay.classList.add('is-active'); overlay.onclick = () => overlay.classList.remove('is-active'); }
-},
-
 start() {
-  this.initSEO(); this.applyTypography(); this.renderHeader();
-  this.buildContent(); this.initScrollInteraction(); this.initSecondaryNav();
+  this.applyTypography(); 
+  this.renderHeader();
+  this.buildContent(); 
+  this.initSecondaryNav(); 
+  this.initFocusMode();
 }
 };
 
