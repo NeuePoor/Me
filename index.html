@@ -115,7 +115,7 @@ transition: background-color 0.25s ease-out;
     text-decoration: none; color: #fff; font-size: var(--header-fs); font-weight: var(--header-fw); opacity: 0; cursor: pointer; pointer-events: auto; transition: opacity 0.3s var(--fl-ease);
     position: relative;
 }
-.fl-logo-text::before { content: ''; position: absolute; top: -12px; bottom: -12px; left: -4px; right: -160px; }
+.fl-logo-text::before { content: ''; position: absolute; top: -12px; bottom: -12px; left: -4px; right: -24px; }
 .fl-logo-text.is-replaced { visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }
 
 .fl-nav { display: flex; gap: 40px; }
@@ -125,7 +125,7 @@ transition: background-color 0.25s ease-out;
 .fl-logo__gif-wrap-pc { 
     position: fixed; top: 0; left: 4px; height: var(--fl-nav-h); display: flex; align-items: center; z-index: 3001; transition: transform 0.4s var(--fl-ease), opacity 0.6s var(--fl-ease); cursor: pointer;
 }
-.fl-logo__gif-wrap-pc::before { content: ''; position: absolute; top: -12px; bottom: -12px; left: -4px; right: -160px; }
+.fl-logo__gif-wrap-pc::before { content: ''; position: absolute; top: -12px; bottom: -12px; left: -4px; right: -24px; }
 .fl-logo__gif-wrap-m { display: none; }
 .fl-logo__gif { height: var(--logo-size-pc); width: auto; opacity: 0; transition: opacity 0.3s var(--fl-ease); }
 
@@ -313,8 +313,8 @@ typography: {
 header: {
   logo: { gif: "https://folio.neuepoor.com/logo.gif", link: "https://fo.neuepoor.com", text: "Foo", font: "Arial, sans-serif", weight: "700", sizePC: "32px", sizeMobile: "clamp(16px, 5vw, 21px)" },
   secondary: [
-    { name: 'Index', link: 'https://works.neuepoor.com', sizePC: "32px", sizeMobile: "clamp(14px, 5vw, 21px)" },
-    { name: 'Archive', link: 'https://Archive.neuepoor.com', sizePC: "32px", sizeMobile: "clamp(14px, 5vw, 21px)" }
+    { name: '(Play)', link: 'https://play.neuepoor.com', sizePC: "32px", sizeMobile: "clamp(14px, 5vw, 21px)" },
+    { name: 'Me', link: 'https://me.neuepoor.com', sizePC: "32px", sizeMobile: "clamp(14px, 5vw, 21px)" }
   ],
   back: { text: "Works●" },
   nav: [ 
@@ -324,7 +324,7 @@ header: {
   ]
 },
 logoPanel: {
-  specialText: { text: "Hi, I'm Fo", sizePC: "32px", sizeMobile: "clamp(14px, 6vw, 21px)" },
+  specialText: { text: "Hi, I'm Fo", link: "https://fo.neuepoor.com", sizePC: "32px", sizeMobile: "clamp(14px, 6vw, 21px)" },
   contact: [
       { name: "Email", link: "mailto:poorleaglguy@qq.com" },
       { name: "Instagram", link: "https://www.instagram.com/neuepoor" },
@@ -437,15 +437,16 @@ renderHeader() {
   if (backIconLink) {
         const handleOpenPinned = (e) => {
             e.preventDefault();
-            document.body.classList.remove('is-preview-action'); // 点按后彻底解除预览占位
             document.body.classList.remove('is-secondary-active');
             if (ENGINE.isMobile()) {
                  ENGINE.showHeroMobile();
             } else {
                  ENGINE.showHeroPC(true); // PC 端点击锁定
+                 // 防误触：记录面板打开时的毫秒级时间戳，用于防穿透连击
+                 const p = document.getElementById('ui-logo-panel');
+                 if (p) p.setAttribute('data-pin-time', Date.now());
             }
         };
-        
         const handleOpenHover = (e) => {
             if (ENGINE.isMobile()) return;
             e.preventDefault();
@@ -502,7 +503,7 @@ resetAllStates() {
     
     if (p) p.classList.remove('is-panel-pinned', 'is-active');
     if (bg) bg.classList.remove('is-expanded');
-    document.body.classList.remove('is-pin-action');
+    document.body.classList.remove('is-pin-action', 'is-preview-action');
     
     // 强制清理由于断点切换残留的内联样式
     if (cr) {
@@ -563,6 +564,12 @@ initTriggersAndInteractions() {
         if (!p.classList.contains('is-panel-pinned')) {
             return; 
         }
+
+        // 防误触时间锁：距离点按 Works● 锁定面板必须大于 400ms，否则吞掉事件，防止点击穿透
+        const pinTime = parseInt(p.getAttribute('data-pin-time') || '0', 10);
+        if (Date.now() - pinTime < 400) {
+            return;
+        }
         
         ENGINE.hideHero();
         setTimeout(() => { window.location.href = CONFIG.header.logo.link || '#'; }, 400);
@@ -571,7 +578,21 @@ initTriggersAndInteractions() {
     if (lwPC) lwPC.onclick = handleLogoClick;
     if (lwM) lwM.onclick = handleLogoClick;
     if (tLogo) tLogo.onclick = handleLogoClick;
-    if (st) st.onclick = handleLogoClick;
+    
+    // 专门为 specialText 注册独立点击事件：严格限制仅在手机端跳转，保护布局与PC端隔离
+    if (st) {
+        st.onclick = (e) => {
+            if (ENGINE.isMobile()) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!p.classList.contains('is-panel-pinned')) return;
+                
+                ENGINE.hideHero();
+                const targetLink = CONFIG.logoPanel.specialText.link || 'https://fo.neuepoor.com';
+                setTimeout(() => { window.location.href = targetLink; }, 400);
+            }
+        };
+    }
     
     if (p) { p.onclick = (e) => { if (e.target === p && p.classList.contains('is-panel-pinned')) ENGINE.hideHero(); }; }
     if (closeBtn) { closeBtn.onclick = (e) => { e.stopPropagation(); ENGINE.hideHero(); }; }
@@ -669,7 +690,7 @@ initFocusMode() {
   const body = document.body;
   
   // Gallery (.fl-item-wrapper) 不包含在触发源中，不干扰主体功能
-  const selectors = 'a, .fl-logo__gif, .fl-info-row, .fl-nav__link, .fl-info__title, .back-icon-link, .fl-logo-link, .fl-hero-special-text, .fl-gallery-link, .fl-close-btn, .fl-logo-text';
+  const selectors = 'a, .fl-logo__gif, .fl-logo__gif-wrap-pc, .fl-info-row, .fl-nav__link, .fl-info__title, .back-icon-link, .fl-logo-link, .fl-hero-special-text, .fl-gallery-link, .fl-close-btn, .fl-logo-text';
   
   document.addEventListener('mouseover', (e) => { 
     if (ENGINE.isMobile()) return;
